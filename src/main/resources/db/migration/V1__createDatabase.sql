@@ -1,6 +1,3 @@
-create database SSO;
-use SSO;
-
 create table user(
 	uuid char(36) not null,
     username varchar(20) not null,
