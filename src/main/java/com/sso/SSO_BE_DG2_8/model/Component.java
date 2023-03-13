@@ -1,12 +1,10 @@
 package com.sso.SSO_BE_DG2_8.model;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import javax.validation.constraints.NotBlank;
+
 
 @Entity
 @Table(name = "component")
@@ -14,34 +12,37 @@ public class Component {
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private UUID uuid;
-
+    private String uuid;
+    @Column
+    @NotBlank
     private String name;
-
+    @Column
+    @NotBlank
     private String code;
-
+    @Column
+    @NotBlank
     private String icon;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    /*@ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_component",
             joinColumns = @JoinColumn(name = "component_uuid"),
             inverseJoinColumns = @JoinColumn(name = "user_uuid"))
-    private Set<User> users = new HashSet<>();
+    private Set<User> users = new HashSet<>();*/
 
     public Component(){}
 
-    public Component(String name, String code, String icon, Set<User> users) {
+    public Component(String name, String code, String icon/*, Set<User> users*/) {
         this.name = name;
         this.code = code;
         this.icon = icon;
-        this.users = users;
+        /*this.users = users;*/
     }
 
-    public UUID getUuid() {
+    public String getUuid() {
         return uuid;
     }
 
-    public void setUuid(UUID uuid) {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
@@ -69,11 +70,11 @@ public class Component {
         this.icon = icon;
     }
 
-    public Set<User> getUsers() {
+    /*public Set<User> getUsers() {
         return users;
     }
 
     public void setUsers(Set<User> users) {
         this.users = users;
-    }
+    }*/
 }

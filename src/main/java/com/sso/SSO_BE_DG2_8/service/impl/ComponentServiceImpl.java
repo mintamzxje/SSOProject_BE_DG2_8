@@ -1,7 +1,8 @@
-package com.sso.SSO_BE_DG2_8.service;
+package com.sso.SSO_BE_DG2_8.service.impl;
 
 import com.sso.SSO_BE_DG2_8.model.Component;
 import com.sso.SSO_BE_DG2_8.repository.ComponentRepository;
+import com.sso.SSO_BE_DG2_8.service.ComponentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class ComponentServiceImpl implements ComponentService{
+public class ComponentServiceImpl implements ComponentService {
     @Autowired
     private ComponentRepository componentRepository;
 
@@ -25,7 +26,7 @@ public class ComponentServiceImpl implements ComponentService{
     }
 
     @Override
-    public Component updateComponent(Component component, UUID uuid) {
+    public Component updateComponent(Component component, String uuid) {
         Optional<Component> check = componentRepository.findById(uuid);
         if (check != null){
             componentRepository.saveAndFlush(component);
@@ -35,7 +36,7 @@ public class ComponentServiceImpl implements ComponentService{
     }
 
     @Override
-    public Boolean deleteComponent(UUID uuid) {
+    public Boolean deleteComponent(String uuid) {
         Optional<Component> check = componentRepository.findById(uuid);
         if (check != null){
             componentRepository.deleteById(uuid);
@@ -45,7 +46,7 @@ public class ComponentServiceImpl implements ComponentService{
     }
 
     @Override
-    public Optional<Component> getComponentById(UUID uuid) {
+    public Optional<Component> getComponentById(String uuid) {
         return componentRepository.findById(uuid);
     }
 }
