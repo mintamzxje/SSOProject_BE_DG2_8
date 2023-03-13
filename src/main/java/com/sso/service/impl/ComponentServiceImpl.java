@@ -1,14 +1,13 @@
-package com.sso.SSO_BE_DG2_8.service.impl;
+package com.sso.service.impl;
 
-import com.sso.SSO_BE_DG2_8.model.Component;
-import com.sso.SSO_BE_DG2_8.repository.ComponentRepository;
-import com.sso.SSO_BE_DG2_8.service.ComponentService;
+import com.sso.model.Component;
+import com.sso.repository.ComponentRepository;
+import com.sso.service.ComponentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class ComponentServiceImpl implements ComponentService {

@@ -1,8 +1,8 @@
-package com.sso.SSO_BE_DG2_8.controller;
+package com.sso.controller;
 
-import com.sso.SSO_BE_DG2_8.dto.ComponentDTO;
-import com.sso.SSO_BE_DG2_8.model.Component;
-import com.sso.SSO_BE_DG2_8.service.impl.ComponentServiceImpl;
+import com.sso.dto.ComponentDTO;
+import com.sso.model.Component;
+import com.sso.service.impl.ComponentServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

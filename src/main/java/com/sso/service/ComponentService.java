@@ -1,10 +1,9 @@
-package com.sso.SSO_BE_DG2_8.service;
+package com.sso.service;
 
-import com.sso.SSO_BE_DG2_8.model.Component;
+import com.sso.model.Component;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface ComponentService {
     List<Component> getAllComponent();

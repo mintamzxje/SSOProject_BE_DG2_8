@@ -1,4 +1,4 @@
-package com.sso.SSO_BE_DG2_8;
+package com.sso;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

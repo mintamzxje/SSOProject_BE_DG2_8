@@ -1,4 +1,4 @@
-package com.sso.SSO_BE_DG2_8.model;
+package com.sso.model;
 
 import org.hibernate.annotations.GenericGenerator;
 

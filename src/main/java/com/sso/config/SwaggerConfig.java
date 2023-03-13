@@ -1,4 +1,4 @@
-package com.sso.SSO_BE_DG2_8.config;
+package com.sso.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
