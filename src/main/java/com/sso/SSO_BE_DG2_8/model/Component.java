@@ -11,11 +11,10 @@ import java.util.UUID;
 @Entity
 @Table(name = "component")
 public class Component {
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "uuid", updatable = false, nullable = false, unique = true, length = 36)
-    @Type(type = "org.hibernate.type.UUIDCharType")
-    private UUID uuid;
+    @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    private String uuid;
 
     private String name;
 
@@ -38,11 +37,11 @@ public class Component {
         this.users = users;
     }
 
-    public UUID getUuid() {
+    public String getUuid() {
         return uuid;
     }
 
-    public void setUuid(UUID uuid) {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 

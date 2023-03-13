@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface ComponentService {
     List<ComponentDTO> getAllComponent();
     ComponentDTO createComponent(ComponentDTO componentDTO);
-    ComponentDTO updateComponent(ComponentDTO componentDTO, UUID uuid);
+    ComponentDTO updateComponent(ComponentDTO componentDTO, String uuid);
     void deleteComponent(UUID uuid);
     ComponentDTO getComponentById(UUID uuid);
 }
