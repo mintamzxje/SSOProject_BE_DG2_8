@@ -11,10 +11,9 @@ import java.util.UUID;
 @Entity
 @Table(name = "component")
 public class Component {
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "uuid", updatable = false, nullable = false, unique = true, length = 36)
-    @Type(type = "org.hibernate.type.UUIDCharType")
+    @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID uuid;
 
     private String name;
