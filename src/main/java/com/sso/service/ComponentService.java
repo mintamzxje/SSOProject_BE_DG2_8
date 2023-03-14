@@ -7,8 +7,9 @@ import java.util.Optional;
 
 public interface ComponentService {
     List<Component> getAllComponent();
-    Component createComponent(Component componentDTO);
-    Component updateComponent(Component componentDTO, String uuid);
+    Component createComponent(Component component);
+    Component addUserToComponent(Component component);
+    Component updateComponent(Component component, String uuid);
     Boolean deleteComponent(String uuid);
-    Optional<Component> getComponentById(String uuid);
+    Component getComponentById(String uuid);
 }

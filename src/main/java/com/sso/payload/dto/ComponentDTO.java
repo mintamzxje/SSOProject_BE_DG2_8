@@ -1,4 +1,4 @@
-package com.sso.dto;
+package com.sso.payload.dto;
 
 public class ComponentDTO {
     private String uuid;

@@ -22,7 +22,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(metaData())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.sso.SSO_BE_DG2_8.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.sso.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }

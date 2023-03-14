@@ -4,6 +4,9 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
@@ -23,19 +26,19 @@ public class Component {
     @NotBlank
     private String icon;
 
-    /*@ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_component",
             joinColumns = @JoinColumn(name = "component_uuid"),
             inverseJoinColumns = @JoinColumn(name = "user_uuid"))
-    private Set<User> users = new HashSet<>();*/
+    private Collection<User> users;
 
     public Component(){}
 
-    public Component(String name, String code, String icon/*, Set<User> users*/) {
+    public Component(String name, String code, String icon, Collection<User> users) {
         this.name = name;
         this.code = code;
         this.icon = icon;
-        /*this.users = users;*/
+        this.users = users;
     }
 
     public String getUuid() {
@@ -70,11 +73,11 @@ public class Component {
         this.icon = icon;
     }
 
-    /*public Set<User> getUsers() {
+    public Collection<User> getUsers() {
         return users;
     }
 
-    public void setUsers(Set<User> users) {
+    public void setUsers(Collection<User> users) {
         this.users = users;
-    }*/
+    }
 }
