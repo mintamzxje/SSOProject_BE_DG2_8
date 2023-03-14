@@ -3,8 +3,11 @@ package com.sso.model;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
 
 @Entity
 @Table(name = "component")
@@ -13,8 +16,14 @@ public class Component {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String uuid;
+    @Column
+    @NotBlank
     private String name;
+    @Column
+    @NotBlank
     private String code;
+    @Column
+    @NotBlank
     private String icon;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -25,7 +34,8 @@ public class Component {
 
     public Component(){}
 
-    public Component(String name, String code, String icon, Set<User> users) {
+    public Component(String uuid, String name, String code, String icon, Set<User> users) {
+        this.uuid = uuid;
         this.name = name;
         this.code = code;
         this.icon = icon;
