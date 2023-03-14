@@ -1,18 +1,21 @@
 package com.sso.controller;
 
 import com.sso.model.User;
-import com.sso.payload.dto.ComponentDTO;
+import com.sso.dto.ComponentDTO;
 import com.sso.model.Component;
 import com.sso.payload.request.AddUserToComponentRequest;
 import com.sso.service.impl.ComponentServiceImpl;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.compress.utils.Lists;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -61,9 +64,13 @@ public class ComponentController {
     @PostMapping("/adduser/{id}")
     @ApiOperation(value = "Add User To Component", response = ResponseEntity.class)
     public ResponseEntity<?> addUserToComponent(@PathVariable(name = "id") String id,@RequestBody AddUserToComponentRequest user){
-        Component component = componentService.getComponentById(id);
-        component.setUsers((Collection<User>) user);
+       /* Component component = componentService.getComponentById(id);
+        Set<String> stringSet = new HashSet<>();
+        stringSet.add(user.getUser_uuid());
+        Set<User> users = new HashSet<>();
+        users.add(stringSet);
+        component.setUsers(Lists.newArrayList(user));
         componentService.addUserToComponent(component);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().build();*/
     }
 }
