@@ -1,6 +1,6 @@
-package com.sso.SSO_BE_DG2_8.service;
+package com.sso.service;
 
-import com.sso.SSO_BE_DG2_8.dto.ComponentDTO;
+import com.sso.dto.ComponentDTO;
 
 import java.util.List;
 import java.util.UUID;

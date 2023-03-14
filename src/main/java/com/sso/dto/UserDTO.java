@@ -1,64 +1,28 @@
-package com.sso.SSO_BE_DG2_8.model;
+package com.sso.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
-@Entity
-@Table(name = "user", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {
-                "userName"
-        }),
-        @UniqueConstraint(columnNames = {
-                "email"
-        })
-})
-public class User {
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
+public class UserDTO {
     private String uuid;
-    @Column
-    @NotBlank
-    @Size(min = 3, max =100)
     private String userName;
-    @NotBlank
-    @Size(min = 6, max =100)
-    @JsonIgnore
-    private String passWord;
-    @Column
-    private String fullName;
-    @Column
-    private String firstName;
-    @Column
-    private String lastName;
-    @Column
-    private String phone;
-    @Column
-    @Email
-    @NotBlank
     private String email;
-    @Column
+    private String password;
+    private String fullName;
+    private String firstName;
+    private String lastName;
+    private String phone;
     private String address;
-    @Lob
     private String avatar;
-
-    public User() {
+    public UserDTO() {
     }
-    public User(String uuid, String userName, String passWord, String fullName, String firstName, String lastName,
-                String phone, String email, String address, String avatar) {
+    public UserDTO(String uuid, String userName, String email, String password, String fullName, String firstName,
+                   String lastName, String phone, String address, String avatar) {
         this.uuid = uuid;
         this.userName = userName;
-        this.passWord = passWord;
+        this.email = email;
+        this.password = password;
         this.fullName = fullName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.phone = phone;
-        this.email = email;
         this.address = address;
         this.avatar = avatar;
     }
@@ -79,12 +43,20 @@ public class User {
         this.userName = userName;
     }
 
-    public String getPassWord() {
-        return passWord;
+    public String getEmail() {
+        return email;
     }
 
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getFullName() {
@@ -117,14 +89,6 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getAddress() {

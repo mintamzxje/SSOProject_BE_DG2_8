@@ -1,12 +1,10 @@
-package com.sso.SSO_BE_DG2_8.model;
+package com.sso.model;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Table(name = "component")
@@ -15,11 +13,8 @@ public class Component {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String uuid;
-
     private String name;
-
     private String code;
-
     private String icon;
 
     @ManyToMany(fetch = FetchType.LAZY)
