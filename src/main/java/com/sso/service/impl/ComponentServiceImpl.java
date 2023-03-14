@@ -1,5 +1,8 @@
 package com.sso.service.impl;
 
+import com.sso.dto.ComponentDTO;
+import com.sso.dto.request.AddUserToComponentRequest;
+import com.sso.mapper.ComponentMapper;
 import com.sso.model.Component;
 import com.sso.repository.ComponentRepository;
 import com.sso.service.ComponentService;
@@ -17,29 +20,36 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     @Transactional
-    public List<Component> getAllComponent() {
-        return componentRepository.findAll();
+    public List<ComponentDTO> getAllComponent() {
+        List<Component> component = componentRepository.findAll();
+        return ComponentMapper.MAPPER.mapListToComponentDTO(component);
     }
 
     @Override
     @Transactional
-    public Component createComponent(Component component) {
-        return componentRepository.save(component);
+    public ComponentDTO createComponent(ComponentDTO componentDTO) {
+        Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
+        componentRepository.save(component);
+        return ComponentMapper.MAPPER.mapToComponentDTO(component);
     }
 
     @Override
     @Transactional
-    public Component addUserToComponent(Component component) {
+    public Component addUserToComponent(String uuid, AddUserToComponentRequest user) {
+        ComponentDTO componentDTO = getComponentById(uuid);
+        Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
+        component.setUsers(user.getUsers());
         return componentRepository.saveAndFlush(component);
     }
 
     @Override
     @Transactional
-    public Component updateComponent(Component component, String uuid) {
-        Optional<Component> check = componentRepository.findById(uuid);
-        if (check != null){
-            componentRepository.save(component);
-            return component;
+    public ComponentDTO updateComponent(ComponentDTO componentDTO, String uuid) {
+        Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
+        Component existing = componentRepository.findById(uuid).get();
+        if (existing != null){
+            component.setUuid(existing.getUuid());
+            return ComponentMapper.MAPPER.mapToComponentDTO(componentRepository.saveAndFlush(component));
         }
         return null;
     }
@@ -57,7 +67,8 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     @Transactional
-    public Component getComponentById(String uuid) {
-        return componentRepository.findById(uuid).orElse(null);
+    public ComponentDTO getComponentById(String uuid) {
+        Component component = componentRepository.findById(uuid).get();
+        return ComponentMapper.MAPPER.mapToComponentDTO(component);
     }
 }
