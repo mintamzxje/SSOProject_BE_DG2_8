@@ -1,4 +1,4 @@
-package com.sso.payload.request;
+package com.sso.dto.request;
 
 import com.sso.model.User;
 
@@ -9,13 +9,13 @@ import java.util.Set;
 
 public class AddUserToComponentRequest{
     @NotBlank
-    private String user_uuid;
+    private Set<User> users;
 
-    public String getUser_uuid() {
-        return user_uuid;
+    public Set<User> getUses() {
+        return users;
     }
 
-    public void setUser_uuid(String user_uuid) {
-        this.user_uuid = user_uuid;
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 }
