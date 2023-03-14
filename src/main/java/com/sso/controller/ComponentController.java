@@ -1,21 +1,18 @@
 package com.sso.controller;
 
-import com.sso.model.User;
 import com.sso.dto.ComponentDTO;
+import com.sso.dto.response.ResponseDTO;
 import com.sso.model.Component;
-import com.sso.payload.request.AddUserToComponentRequest;
+import com.sso.dto.request.AddUserToComponentRequest;
 import com.sso.service.impl.ComponentServiceImpl;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.compress.utils.Lists;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -57,20 +54,20 @@ public class ComponentController {
     }
     @DeleteMapping("/delete/{id}")
     @ApiOperation(value = "Delete Component", response = ResponseEntity.class)
-    public ResponseEntity<ComponentDTO> deleteComponent(@PathVariable(name = "id") String id){
-        componentService.deleteComponent(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deleteComponent(@PathVariable(name = "id") String id){
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseDTO("","delete success",componentService.deleteComponent(id))
+        );
     }
     @PostMapping("/adduser/{id}")
     @ApiOperation(value = "Add User To Component", response = ResponseEntity.class)
     public ResponseEntity<?> addUserToComponent(@PathVariable(name = "id") String id,@RequestBody AddUserToComponentRequest user){
-       /* Component component = componentService.getComponentById(id);
-        Set<String> stringSet = new HashSet<>();
-        stringSet.add(user.getUser_uuid());
-        Set<User> users = new HashSet<>();
-        users.add(stringSet);
-        component.setUsers(Lists.newArrayList(user));
+        Component component = componentService.getComponentById(id);
+        component.setUsers(user.getUses());
         componentService.addUserToComponent(component);
-        return ResponseEntity.ok().build();*/
+        //return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseDTO("","add success")
+        );
     }
 }
