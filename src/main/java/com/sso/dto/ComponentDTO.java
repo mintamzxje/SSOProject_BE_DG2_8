@@ -1,4 +1,4 @@
-package com.sso.SSO_BE_DG2_8.dto;
+package com.sso.dto;
 
 import java.util.UUID;
 

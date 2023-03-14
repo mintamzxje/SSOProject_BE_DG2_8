@@ -1,6 +1,6 @@
-package com.sso.SSO_BE_DG2_8.repository;
+package com.sso.repository;
 
-import com.sso.SSO_BE_DG2_8.model.Component;
+import com.sso.model.Component;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
