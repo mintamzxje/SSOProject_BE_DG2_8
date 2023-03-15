@@ -71,4 +71,11 @@ public class ComponentServiceImpl implements ComponentService {
         Component component = componentRepository.findById(uuid).get();
         return ComponentMapper.MAPPER.mapToComponentDTO(component);
     }
+
+    @Override
+    @Transactional
+    public List<ComponentDTO> getComponentByUserUuid(String uuid) {
+        List<Component> component = componentRepository.GetComponentByUserUUID(uuid);
+        return ComponentMapper.MAPPER.mapListToComponentDTO(component);
+    }
 }
