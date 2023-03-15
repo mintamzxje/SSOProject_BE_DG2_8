@@ -52,12 +52,4 @@ public class ComponentController {
                 new ResponseDTO("","delete success", componentService.deleteComponent(id))
         );
     }
-    @PostMapping("/adduser/{id}")
-    @ApiOperation(value = "Add User To Component", response = ResponseEntity.class)
-    public ResponseEntity<?> addUserToComponent(@PathVariable(name = "id") String id,@RequestBody AddUserToComponentRequest user){
-        componentService.addUserToComponent(id, user);
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO("","add success")
-        );
-    }
 }

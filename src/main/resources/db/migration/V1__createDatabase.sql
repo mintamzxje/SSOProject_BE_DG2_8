@@ -9,6 +9,8 @@ create table user(
     email varchar(50) not null,
     address varchar(255) not null,
     avatar varchar(255) not null,
+    token varchar(255) ,
+    token_creation_date timestamp,
     primary key(uuid),
     unique(email,username)
 ) ENGINE = InnoDB
