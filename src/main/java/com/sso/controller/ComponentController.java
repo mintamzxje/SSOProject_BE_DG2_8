@@ -2,7 +2,6 @@ package com.sso.controller;
 
 import com.sso.dto.ComponentDTO;
 import com.sso.dto.response.ResponseDTO;
-import com.sso.model.Component;
 import com.sso.dto.request.AddUserToComponentRequest;
 import com.sso.service.impl.ComponentServiceImpl;
 import io.swagger.annotations.ApiOperation;
@@ -12,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/api/component")
