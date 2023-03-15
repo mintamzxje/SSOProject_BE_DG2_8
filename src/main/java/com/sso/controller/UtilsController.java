@@ -36,28 +36,5 @@ public class UtilsController {
             System.out.println("error when import excel");
         }
     }
-
-    @Autowired
-    MailMergeNotification mailMergeNotification;
-    @PostMapping("/mailMergeNotification/{id}")
-    public ResponseEntity<Resource> mailMergeNotification(@PathVariable(name = "id") String uuid) throws Exception {
-        String pdfPath = "";
-        try {
-            pdfPath = mailMergeNotification.MailMergeData(uuid);
-            File file = new File(pdfPath);
-            ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(file.toPath()));
-
-            HttpHeaders headers = new HttpHeaders();
-            String headerKey = "Content-Disposition";
-            String headerValue = "attachment; filename=list-component.pdf";
-            headers.set(headerKey, headerValue);
-
-            return ResponseEntity.ok().headers(headers).contentLength(file.length())
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
-        } finally {
-            File file = new File(pdfPath);
-            Files.delete(file.toPath());
-        }
-    }
 }
 
