@@ -11,6 +11,8 @@ public interface UserService {
     UserDTO getOneUser(String uuid);
     Page<User> getPage(Pageable pageable);
     boolean delete(String uuid);
+    String forgotPassword(String email);
+    String resetPassword(String token, String password);
 
     boolean existsByUuid(String uuid);
     boolean existsByUserName(String userName);
