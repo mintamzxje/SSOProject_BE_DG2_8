@@ -1,12 +1,13 @@
 package com.sso.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sso.dto.UserDTO;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user", uniqueConstraints = {
@@ -46,11 +47,17 @@ public class User {
     @Lob
     @Column(name = "avatar")
     private String avatar;
+    @Column(name = "token")
+    private String token;
+    @Column(name = "token_creation_date")
+    private LocalDateTime tokenCreationDate;
 
     public User() {
     }
+
     public User(String uuid, String userName, String passWord, String fullName, String firstName, String lastName,
-                String phone, String email, String address, String avatar) {
+                String phone, String email, String address, String avatar, String token,
+                LocalDateTime tokenCreationDate) {
         this.uuid = uuid;
         this.userName = userName;
         this.passWord = passWord;
@@ -61,7 +68,10 @@ public class User {
         this.email = email;
         this.address = address;
         this.avatar = avatar;
+        this.token = token;
+        this.tokenCreationDate = tokenCreationDate;
     }
+
     public User(@NotBlank String userName,
                 @NotBlank String passWord,
                 @NotBlank String fullName,
@@ -82,11 +92,20 @@ public class User {
         this.avatar = avatar;
     }
 
-    public User(String userName, String name, String email, UserDTO userDTO, String passWord) {
-        this.userName = userName;
-        this.fullName = name;
-        this.email = email;
-        this.passWord = passWord;
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public LocalDateTime getTokenCreationDate() {
+        return tokenCreationDate;
+    }
+
+    public void setTokenCreationDate(LocalDateTime tokenCreationDate) {
+        this.tokenCreationDate = tokenCreationDate;
     }
 
     public String getUuid() {

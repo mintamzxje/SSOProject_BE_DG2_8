@@ -61,16 +61,5 @@ public class ComponentController {
         componentService.deleteComponent(id);
         return ResponseEntity.ok().build();
     }
-    @PostMapping("/adduser/{id}")
-    @ApiOperation(value = "Add User To Component", response = ResponseEntity.class)
-    public ResponseEntity<?> addUserToComponent(@PathVariable(name = "id") String id,@RequestBody AddUserToComponentRequest user){
-       /* Component component = componentService.getComponentById(id);
-        Set<String> stringSet = new HashSet<>();
-        stringSet.add(user.getUser_uuid());
-        Set<User> users = new HashSet<>();
-        users.add(stringSet);
-        component.setUsers(Lists.newArrayList(user));
-        componentService.addUserToComponent(component);
-        return ResponseEntity.ok().build();*/
-    }
+
 }

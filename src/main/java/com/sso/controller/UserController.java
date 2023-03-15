@@ -2,7 +2,9 @@ package com.sso.controller;
 
 import com.sso.dto.UserDTO;
 import com.sso.dto.response.ResponseDTO;
+import com.sso.model.EmailDetails;
 import com.sso.model.User;
+import com.sso.service.EmailSendService;
 import com.sso.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,11 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/auth/")
@@ -26,6 +26,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private EmailSendService emailSendService;
 
     @GetMapping("/")
     public ResponseEntity<?> getOneUserDTO(@RequestParam String uuid) {
@@ -37,7 +39,6 @@ public class UserController {
                 new ResponseDTO("","get success",userService.getOneUser(uuid))
         );
     }
-
     @GetMapping("/page")
     public ResponseEntity<?> getPage(@RequestParam("limit") int limit, @RequestParam("offset") int offset) {
         try {
@@ -63,7 +64,6 @@ public class UserController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
     @PostMapping("/add")
     public ResponseEntity<?> add(@Valid @RequestBody UserDTO userDTO) {
         if (userService.existsByUserName(userDTO.getUserName())) {
@@ -105,5 +105,42 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO("","delete success",userService.delete(uuid))
         );
+    }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> resetPassword(HttpServletRequest request, @RequestParam("email") String email) {
+        String response = userService.forgotPassword(email);
+        if(!response.startsWith("Invalid")) {
+            String url= "http://localhost:8080/swagger-ui/#/user-controller/resetPasswordUsingPUT";
+            EmailDetails emailDetails = new EmailDetails();
+            emailDetails.setSubject("Forgot Password");
+            emailDetails.setMsgBody(
+                    "url change password: "+url+" token: "+response
+            );
+            emailDetails.setRecipient(email);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseDTO("","success",emailSendService.sendSimpleMail(emailDetails))
+            );
+        } else {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseDTO("error","find not email: "+email)
+        );
+        }
+    }
+    @PutMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestParam String password) {
+        String response = userService.resetPassword(token,password);
+        if(response.startsWith("Invalid")) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseDTO("error","find not token: "+token)
+            );
+        } else if (response.contains("Token expired.")) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseDTO(response)
+            );
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseDTO(response)
+            );
+        }
     }
 }
