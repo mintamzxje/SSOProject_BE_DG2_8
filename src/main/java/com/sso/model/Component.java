@@ -1,5 +1,8 @@
 package com.sso.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -11,6 +14,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "component")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Component {
     @Id
     @GeneratedValue(generator = "uuid")
@@ -31,54 +37,4 @@ public class Component {
             joinColumns = @JoinColumn(name = "component_uuid"),
             inverseJoinColumns = @JoinColumn(name = "user_uuid"))
     private Set<User> users = new HashSet<>();
-
-    public Component(){}
-
-    public Component(String uuid, String name, String code, String icon, Set<User> users) {
-        this.uuid = uuid;
-        this.name = name;
-        this.code = code;
-        this.icon = icon;
-        this.users = users;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
-    }
 }
