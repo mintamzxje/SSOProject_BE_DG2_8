@@ -1,9 +1,9 @@
 package com.sso.controller;
 
 import com.sso.doc.MailMergeNotification;
-import com.sso.dto.ComponentDTO;
-import com.sso.dto.response.ResponseDTO;
-import com.sso.dto.request.AddUserToComponentRequest;
+import com.sso.payload.dto.ComponentDTO;
+import com.sso.payload.response.ResponseDTO;
+import com.sso.payload.request.AddUserToComponentRequest;
 import com.sso.service.impl.ComponentServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +25,9 @@ import java.util.List;
 public class ComponentController {
     @Autowired
     private ComponentServiceImpl componentService;
+    @Autowired
+    MailMergeNotification mailMergeNotification;
+
     @GetMapping("/all")
     @ApiOperation(value = "Get All Component", response = List.class)
     public List<ComponentDTO> getAllComponent(){
@@ -67,9 +70,13 @@ public class ComponentController {
                 new ResponseDTO("","add success")
         );
     }
-    @Autowired
-    MailMergeNotification mailMergeNotification;
+    @GetMapping("/get-component-by-user-uuid/{id}")
+    @ApiOperation(value = "Get All List Components For User", response = ResponseEntity.class)
+    public ResponseEntity<?> getListComponentByUserUuid(@PathVariable(name = "id") String id){
+        return ResponseEntity.ok().body(componentService.getComponentByUserUuid(id));
+    }
     @PostMapping("/mailMergeNotification/{id}")
+    @ApiOperation(value = "Mail Merge Notification List Component For User", response = ResponseEntity.class)
     public ResponseEntity<Resource> mailMergeNotification(@PathVariable(name = "id") String uuid) throws Exception {
         String pdfPath = "";
         try {
