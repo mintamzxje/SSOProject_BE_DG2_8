@@ -1,7 +1,7 @@
 package com.sso.controller;
 
-import com.sso.dto.UserDTO;
-import com.sso.dto.response.ResponseDTO;
+import com.sso.payload.dto.UserDTO;
+import com.sso.payload.response.ResponseDTO;
 import com.sso.model.EmailDetails;
 import com.sso.model.User;
 import com.sso.service.EmailSendService;

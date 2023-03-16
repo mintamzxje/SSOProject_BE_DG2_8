@@ -1,4 +1,4 @@
-package com.sso.dto.request;
+package com.sso.payload.request;
 
 import com.sso.model.User;
 import lombok.AllArgsConstructor;

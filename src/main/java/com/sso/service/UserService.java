@@ -1,6 +1,6 @@
 package com.sso.service;
 
-import com.sso.dto.UserDTO;
+import com.sso.payload.dto.UserDTO;
 import com.sso.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,4 +1,4 @@
-package com.sso.dto.response;
+package com.sso.payload.response;
 
 public class ResponseDTO {
     private String error;

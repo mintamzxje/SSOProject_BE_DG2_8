@@ -1,11 +1,10 @@
 package com.sso.service;
 
-import com.sso.dto.ComponentDTO;
-import com.sso.dto.request.AddUserToComponentRequest;
+import com.sso.payload.dto.ComponentDTO;
+import com.sso.payload.request.AddUserToComponentRequest;
 import com.sso.model.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ComponentService {
     List<ComponentDTO> getAllComponent();
