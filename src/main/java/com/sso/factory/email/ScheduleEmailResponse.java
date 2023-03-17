@@ -1,5 +1,6 @@
-package com.sso.dto.response;
+package com.sso.factory.email;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import org.springframework.http.HttpStatus;
 
@@ -8,7 +9,8 @@ import org.springframework.http.HttpStatus;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ResponseDTO {
+//@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ScheduleEmailResponse {
     private boolean success;
     private HttpStatus code;
     private String errorMessage;

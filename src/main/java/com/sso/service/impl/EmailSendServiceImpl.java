@@ -1,7 +1,9 @@
 package com.sso.service.impl;
 
+import com.sso.factory.email.EmailJob;
 import com.sso.model.EmailDetails;
 import com.sso.service.EmailSendService;
+import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -13,6 +15,9 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
+import java.time.ZonedDateTime;
+import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class EmailSendServiceImpl implements EmailSendService {
@@ -65,5 +70,31 @@ public class EmailSendServiceImpl implements EmailSendService {
             // Display message when exception occurred
             return "Error while sending mail!!!";
         }
+    }
+
+    @Override
+    public JobDetail buildJobDetail(EmailDetails emailDetails) {
+        JobDataMap jobDataMap = new JobDataMap();
+
+        jobDataMap.put("recipient", emailDetails.getRecipient());
+        jobDataMap.put("subject", emailDetails.getSubject());
+        jobDataMap.put("msgBody", emailDetails.getMsgBody());
+        return JobBuilder.newJob(EmailJob.class)
+                .withIdentity(UUID.randomUUID().toString(), "email-jobs")
+                .withDescription("Send Email Job")
+                .usingJobData(jobDataMap)
+                .storeDurably()
+                .build();
+    }
+
+    @Override
+    public Trigger buildJobTrigger(JobDetail jobDetail, ZonedDateTime startAt) {
+        return TriggerBuilder.newTrigger()
+                .forJob(jobDetail)
+                .withIdentity(jobDetail.getKey().getName(), "email-triggers")
+                .withDescription("Send Email Trigger")
+                .startAt(Date.from(startAt.toInstant()))
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule().withMisfireHandlingInstructionFireNow())
+                .build();
     }
 }
