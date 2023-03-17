@@ -51,7 +51,6 @@ public class User {
     private String token;
     @Column(name = "token_creation_date")
     private LocalDateTime tokenCreationDate;
-
     public User() {
     }
 

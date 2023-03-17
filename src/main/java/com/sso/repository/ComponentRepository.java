@@ -10,6 +10,5 @@ import java.util.List;
 
 @Repository
 public interface ComponentRepository extends JpaRepository<Component, String> {
-    @Query(value = "select component.uuid, component.name, component.code, component.icon from component inner join user where user.uuid = :uuid", nativeQuery = true)
-    List<Component> GetComponentByUserUUID(@Param("uuid") String uuid);
+    List<Component> findComponentsByUsersUuid(String uuid);
 }
