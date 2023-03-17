@@ -2,15 +2,13 @@ package com.sso.doc;
 
 import com.spire.doc.Document;
 import com.spire.doc.FileFormat;
-import com.spire.doc.reporting.MailMergeDataTable;
-import com.sso.payload.dto.ComponentDTO;
-import com.sso.payload.dto.UserDTO;
+
 import com.sso.service.impl.ComponentServiceImpl;
 import com.sso.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+
 
 @Service
 public class MailMergeNotification {
