@@ -13,4 +13,5 @@ public interface ComponentService {
     ComponentDTO updateComponent(ComponentDTO componentDTO, String uuid);
     Boolean deleteComponent(String uuid);
     ComponentDTO getComponentById(String uuid);
+    List<ComponentDTO> getComponentByUserUuid(String uuid);
 }
