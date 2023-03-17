@@ -1,6 +1,6 @@
 package com.sso.service.impl;
 
-import com.sso.dto.UserDTO;
+import com.sso.payload.dto.UserDTO;
 import com.sso.model.User;
 import com.sso.repository.UserRepository;
 import com.sso.service.UserService;

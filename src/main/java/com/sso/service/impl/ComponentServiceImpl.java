@@ -1,7 +1,7 @@
 package com.sso.service.impl;
 
-import com.sso.dto.ComponentDTO;
-import com.sso.dto.request.AddUserToComponentRequest;
+import com.sso.payload.dto.ComponentDTO;
+import com.sso.payload.request.AddUserToComponentRequest;
 import com.sso.mapper.ComponentMapper;
 import com.sso.model.Component;
 import com.sso.repository.ComponentRepository;

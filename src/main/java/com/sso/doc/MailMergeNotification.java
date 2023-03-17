@@ -2,8 +2,8 @@ package com.sso.doc;
 
 import com.spire.doc.Document;
 import com.spire.doc.FileFormat;
-import com.sso.dto.ComponentDTO;
-import com.sso.dto.UserDTO;
+import com.sso.payload.dto.ComponentDTO;
+import com.sso.payload.dto.UserDTO;
 import com.sso.mapper.ComponentMapper;
 import com.sso.model.Component;
 import com.sso.service.impl.ComponentServiceImpl;
@@ -14,10 +14,8 @@ import org.springframework.stereotype.Service;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class MailMergeNotification {

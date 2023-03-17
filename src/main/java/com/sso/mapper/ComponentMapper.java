@@ -1,6 +1,6 @@
 package com.sso.mapper;
 
-import com.sso.dto.ComponentDTO;
+import com.sso.payload.dto.ComponentDTO;
 import com.sso.model.Component;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

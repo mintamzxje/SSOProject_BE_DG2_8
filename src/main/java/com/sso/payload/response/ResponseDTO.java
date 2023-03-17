@@ -1,4 +1,4 @@
-package com.sso.dto.response;
+package com.sso.payload.response;
 
 import lombok.*;
 import org.springframework.http.HttpStatus;
