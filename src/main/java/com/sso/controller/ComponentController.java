@@ -60,16 +60,15 @@ public class ComponentController {
     @ApiOperation(value = "Delete Component", response = ResponseEntity.class)
     public ResponseEntity<?> deleteComponent(@PathVariable(name = "id") String id){
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO("","delete success", componentService.deleteComponent(id))
+                new ResponseDTO(true,HttpStatus.OK,"null", componentService.deleteComponent(id))
         );
     }
     @PostMapping("/{id}/adduser")
     @ApiOperation(value = "Add User To Component", response = ResponseEntity.class)
     public ResponseEntity<?> addUserToComponent(@PathVariable(name = "id") String id,
                                                 @RequestBody AddUserToComponentRequest user){
-        componentService.addUserToComponent(id, user);
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO("","add success",componentService.getAllUserInComponent(id))
+                new ResponseDTO(true,HttpStatus.OK,"null",componentService.addUserToComponent(id, user))
         );
     }
     @GetMapping("/get-list-component-for-user/{id}")
