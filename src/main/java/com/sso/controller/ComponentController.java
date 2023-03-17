@@ -47,12 +47,13 @@ public class ComponentController {
     }
     @PutMapping("/update/{id}")
     @ApiOperation(value = "Update Component", response = ResponseEntity.class)
-    public ResponseEntity<?> updateComponent(@PathVariable(name = "id") String id, @RequestBody ComponentDTO componentRequest){
+    public ResponseEntity<?> updateComponent(@PathVariable(name = "id") String id,
+                                             @RequestBody ComponentDTO componentRequest){
         if(componentService.updateComponent(componentRequest, id) != null){
             ComponentDTO componentDTO = componentService.getComponentById(id);
-            return ResponseEntity.ok().body(componentDTO);
+            return new ResponseEntity<>(componentDTO, HttpStatus.OK);
         }else {
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
     @DeleteMapping("/delete/{id}")
@@ -62,18 +63,24 @@ public class ComponentController {
                 new ResponseDTO("","delete success", componentService.deleteComponent(id))
         );
     }
-    @PostMapping("/adduser/{id}")
+    @PostMapping("/{id}/adduser")
     @ApiOperation(value = "Add User To Component", response = ResponseEntity.class)
-    public ResponseEntity<?> addUserToComponent(@PathVariable(name = "id") String id,@RequestBody AddUserToComponentRequest user){
+    public ResponseEntity<?> addUserToComponent(@PathVariable(name = "id") String id,
+                                                @RequestBody AddUserToComponentRequest user){
         componentService.addUserToComponent(id, user);
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO("","add success")
+                new ResponseDTO("","add success",componentService.getAllUserInComponent(id))
         );
     }
-    @GetMapping("/get-component-by-user-uuid/{id}")
+    @GetMapping("/get-list-component-for-user/{id}")
     @ApiOperation(value = "Get All List Components For User", response = ResponseEntity.class)
     public ResponseEntity<?> getListComponentByUserUuid(@PathVariable(name = "id") String id){
         return ResponseEntity.ok().body(componentService.getComponentByUserUuid(id));
+    }
+    @GetMapping("/get-list-user-in-component/{id}")
+    @ApiOperation(value = "Get All List User For Component", response = ResponseEntity.class)
+    public ResponseEntity<?> getListUserInComponent(@PathVariable(name = "id") String id){
+        return ResponseEntity.ok().body(componentService.getAllUserInComponent(id));
     }
     @PostMapping("/mailMergeNotification/{id}")
     @ApiOperation(value = "Mail Merge Notification List Component For User", response = ResponseEntity.class)

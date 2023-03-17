@@ -32,7 +32,7 @@ public class Component {
     @NotBlank
     private String icon;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "user_component",
             joinColumns = @JoinColumn(name = "component_uuid"),
             inverseJoinColumns = @JoinColumn(name = "user_uuid"))
