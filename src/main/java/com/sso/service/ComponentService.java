@@ -17,4 +17,5 @@ public interface ComponentService {
     ComponentDTO getComponentById(String uuid);
     List<ComponentDTO> getComponentByUserUuid(String uuid);
     Set<User> getAllUserInComponent(String uuid);
+    Boolean existsById(String uuid);
 }

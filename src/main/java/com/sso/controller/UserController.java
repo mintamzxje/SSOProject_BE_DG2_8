@@ -1,5 +1,6 @@
 package com.sso.controller;
 
+import com.sso.exception.NotFoundException;
 import com.sso.payload.dto.UserDTO;
 import com.sso.payload.response.ResponseDTO;
 

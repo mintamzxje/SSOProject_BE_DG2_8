@@ -89,4 +89,9 @@ public class ComponentServiceImpl implements ComponentService {
         Component component = componentRepository.findById(uuid).orElse(null);
         return component.getUsers();
     }
+
+    @Override
+    public Boolean existsById(String uuid) {
+        return componentRepository.existsById(uuid);
+    }
 }
