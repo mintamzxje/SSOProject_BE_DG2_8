@@ -1,6 +1,7 @@
 package com.sso.controller;
 
 import com.sso.doc.MailMergeNotification;
+import com.sso.exception.NotFoundException;
 import com.sso.payload.dto.ComponentDTO;
 import com.sso.payload.response.ResponseDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.List;
 
 
 @RestController
@@ -29,21 +29,31 @@ public class ComponentController {
     MailMergeNotification mailMergeNotification;
 
     @GetMapping("/all")
-    @ApiOperation(value = "Get All Component", response = List.class)
-    public List<ComponentDTO> getAllComponent(){
-        return componentService.getAllComponent();
+    @ApiOperation(value = "Get All Component", response = ResponseEntity.class)
+    public ResponseEntity<?> getAllComponent(){
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseDTO(true, HttpStatus.OK, "", componentService.getAllComponent()));
     }
     @GetMapping("/{id}")
     @ApiOperation(value = "Get Component By Id", response = ResponseEntity.class)
     public ResponseEntity<?> getComponentById(@PathVariable(name = "id") String id){
-        ComponentDTO componentDTO = componentService.getComponentById(id);
-        return ResponseEntity.ok().body(componentDTO);
+        if(!componentService.existsById(id))
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ResponseDTO(false, HttpStatus.NOT_FOUND, "ID Not Found", null)
+            );
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseDTO(true, HttpStatus.OK, "", componentService.getComponentById(id))
+        );
     }
     @PostMapping("/create")
     @ApiOperation(value = "Create New Component", response = ResponseEntity.class)
     public ResponseEntity<?> createNewComponent(@RequestBody ComponentDTO componentRequest){
-        ComponentDTO componentResponse = componentService.createComponent(componentRequest);
-        return ResponseEntity.ok().body(componentResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                new ResponseDTO(true, HttpStatus.CREATED, "",
+                        componentService.createComponent(componentRequest))
+        );
     }
     @PutMapping("/update/{id}")
     @ApiOperation(value = "Update Component", response = ResponseEntity.class)
@@ -51,16 +61,20 @@ public class ComponentController {
                                              @RequestBody ComponentDTO componentRequest){
         if(componentService.updateComponent(componentRequest, id) != null){
             ComponentDTO componentDTO = componentService.getComponentById(id);
-            return new ResponseEntity<>(componentDTO, HttpStatus.OK);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseDTO(true, HttpStatus.OK, "", componentDTO)
+            );
         }else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ResponseDTO(false, HttpStatus.BAD_REQUEST, "ID Not Found", id)
+            );
         }
     }
     @DeleteMapping("/delete/{id}")
     @ApiOperation(value = "Delete Component", response = ResponseEntity.class)
     public ResponseEntity<?> deleteComponent(@PathVariable(name = "id") String id){
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO(true,HttpStatus.OK,"null", componentService.deleteComponent(id))
+                new ResponseDTO(true, HttpStatus.OK, "", componentService.deleteComponent(id))
         );
     }
     @PostMapping("/{id}/adduser")
@@ -68,18 +82,30 @@ public class ComponentController {
     public ResponseEntity<?> addUserToComponent(@PathVariable(name = "id") String id,
                                                 @RequestBody AddUserToComponentRequest user){
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO(true,HttpStatus.OK,"null",componentService.addUserToComponent(id, user))
+                new ResponseDTO(true, HttpStatus.OK, "null",componentService.addUserToComponent(id, user))
         );
     }
     @GetMapping("/get-list-component-for-user/{id}")
     @ApiOperation(value = "Get All List Components For User", response = ResponseEntity.class)
     public ResponseEntity<?> getListComponentByUserUuid(@PathVariable(name = "id") String id){
-        return ResponseEntity.ok().body(componentService.getComponentByUserUuid(id));
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseDTO(true, HttpStatus.OK, "",
+                        componentService.getComponentByUserUuid(id))
+        );
     }
     @GetMapping("/get-list-user-in-component/{id}")
     @ApiOperation(value = "Get All List User For Component", response = ResponseEntity.class)
     public ResponseEntity<?> getListUserInComponent(@PathVariable(name = "id") String id){
-        return ResponseEntity.ok().body(componentService.getAllUserInComponent(id));
+        if(!componentService.existsById(id))
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+              new ResponseDTO(false, HttpStatus.NOT_FOUND, "ID Not Found", null)
+            );
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseDTO(true, HttpStatus.OK, "",
+                        componentService.getAllUserInComponent(id))
+        );
     }
     @PostMapping("/mailMergeNotification/{id}")
     @ApiOperation(value = "Mail Merge Notification List Component For User", response = ResponseEntity.class)
