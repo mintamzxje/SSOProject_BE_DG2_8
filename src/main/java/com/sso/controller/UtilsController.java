@@ -1,20 +1,14 @@
 package com.sso.controller;
 
-import com.sso.doc.MailMergeNotification;
+import com.sso.model.User;
 import com.sso.service.UserExcelService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.nio.file.Files;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/utils/")
@@ -33,8 +27,21 @@ public class UtilsController {
             userExcelService.exportUsersFromComponent(response, componentId);
         }
         catch (Exception e){
+            System.out.println("error when export excel");
+        }
+    }
+
+    @PostMapping("/import/{componentId}")
+    public List<User> importUsers(@RequestPart MultipartFile file, @PathVariable String componentId){
+        List<User> result = null;
+        try{
+            result = userExcelService.importUsersFromExcel(file, componentId);
+        }
+        catch (Exception e){
             System.out.println("error when import excel");
         }
+
+        return result;
     }
 }
 
