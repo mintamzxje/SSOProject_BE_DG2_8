@@ -1,5 +1,7 @@
 package com.sso.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sso.doc.MailMergeNotification;
 import com.sso.exception.NotFoundException;
 import com.sso.model.Component;
@@ -16,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -48,12 +51,13 @@ public class ComponentController {
                 new ResponseDTO(true, HttpStatus.OK, "", componentService.getComponentById(id))
         );
     }
-    @PostMapping("/create")
+    @PostMapping(value = "/create", consumes = {"multipart/form-data", "application/json"})
     @ApiOperation(value = "Create New Component", response = ResponseEntity.class)
-    public ResponseEntity<?> createNewComponent(@RequestBody ComponentDTO componentRequest){
+    public ResponseEntity<?> createNewComponent(@RequestBody ComponentDTO componentRequest,
+                                                @RequestPart(name = "file") MultipartFile file){
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ResponseDTO(true, HttpStatus.CREATED, "",
-                        componentService.createComponent(componentRequest))
+                        componentService.createComponent(componentRequest, file))
         );
     }
     @PutMapping("/update/{id}")

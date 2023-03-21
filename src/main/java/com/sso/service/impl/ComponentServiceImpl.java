@@ -1,5 +1,6 @@
 package com.sso.service.impl;
 
+import com.sso.factory.file.FilesStorageService;
 import com.sso.model.User;
 import com.sso.payload.dto.ComponentDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
@@ -11,6 +12,7 @@ import com.sso.service.ComponentService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -25,6 +27,9 @@ public class ComponentServiceImpl implements ComponentService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private FilesStorageService filesStorageService;
+
     @Override
     @Transactional
     public List<ComponentDTO> getAllComponent() {
@@ -34,8 +39,10 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     @Transactional
-    public ComponentDTO createComponent(ComponentDTO componentDTO) {
+    public ComponentDTO createComponent(ComponentDTO componentDTO, MultipartFile file) {
+        filesStorageService.saveAs(file, "/component/" + file.getOriginalFilename());
         Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
+        component.setIcon(file.getOriginalFilename());
         componentRepository.save(component);
         return ComponentMapper.MAPPER.mapToComponentDTO(component);
     }
