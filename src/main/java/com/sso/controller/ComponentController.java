@@ -2,6 +2,7 @@ package com.sso.controller;
 
 import com.sso.doc.MailMergeNotification;
 import com.sso.exception.NotFoundException;
+import com.sso.model.Component;
 import com.sso.payload.dto.ComponentDTO;
 import com.sso.payload.response.ResponseDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
@@ -73,6 +74,12 @@ public class ComponentController {
     @DeleteMapping("/delete/{id}")
     @ApiOperation(value = "Delete Component", response = ResponseEntity.class)
     public ResponseEntity<?> deleteComponent(@PathVariable(name = "id") String id){
+        if(!componentService.existsById(id))
+        {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ResponseDTO(false, HttpStatus.BAD_REQUEST, "ID Not Found", null)
+            );
+        }
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "", componentService.deleteComponent(id))
         );
@@ -82,7 +89,8 @@ public class ComponentController {
     public ResponseEntity<?> addUserToComponent(@PathVariable(name = "id") String id,
                                                 @RequestBody AddUserToComponentRequest user){
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO(true, HttpStatus.OK, "null",componentService.addUserToComponent(id, user))
+                new ResponseDTO(true, HttpStatus.OK, "null",
+                        componentService.addUserToComponent(id, user))
         );
     }
     @GetMapping("/get-list-component-for-user/{id}")
@@ -98,8 +106,8 @@ public class ComponentController {
     public ResponseEntity<?> getListUserInComponent(@PathVariable(name = "id") String id){
         if(!componentService.existsById(id))
         {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-              new ResponseDTO(false, HttpStatus.NOT_FOUND, "ID Not Found", null)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+              new ResponseDTO(false, HttpStatus.BAD_REQUEST, "ID Not Found", null)
             );
         }
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -120,7 +128,6 @@ public class ComponentController {
             String headerKey = "Content-Disposition";
             String headerValue = "attachment; filename=list-component.pdf";
             headers.set(headerKey, headerValue);
-
             return ResponseEntity.ok().headers(headers).contentLength(file.length())
                     .contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
         } finally {

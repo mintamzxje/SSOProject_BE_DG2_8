@@ -6,13 +6,14 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "user", uniqueConstraints = {
         @UniqueConstraint(columnNames = {
-                "userName"
+                "username"
         }),
         @UniqueConstraint(columnNames = {
                 "email"
@@ -24,7 +25,7 @@ public class User {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String uuid;
     @Column(name = "username")
-    @NotBlank
+
     private String userName;
     @NotBlank
     @JsonIgnore
@@ -51,6 +52,8 @@ public class User {
     private String token;
     @Column(name = "token_creation_date")
     private LocalDateTime tokenCreationDate;
+    @ManyToMany(mappedBy = "users")
+    private Set<Component> components = new HashSet<>();
     public User() {
     }
 
@@ -185,5 +188,16 @@ public class User {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public Set<Component> getComponents() {
+        return components;
+    }
+
+    public void setComponents(Set<Component> components) {
+        this.components = components;
+    }
+    public void setComponent(Component component){
+        this.components.add(component);
     }
 }

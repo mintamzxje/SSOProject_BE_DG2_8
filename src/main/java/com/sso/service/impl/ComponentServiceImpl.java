@@ -2,19 +2,18 @@ package com.sso.service.impl;
 
 import com.sso.model.User;
 import com.sso.payload.dto.ComponentDTO;
-import com.sso.payload.dto.UserDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
 import com.sso.mapper.ComponentMapper;
 import com.sso.model.Component;
 import com.sso.repository.ComponentRepository;
 import com.sso.repository.UserRepository;
 import com.sso.service.ComponentService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,6 +21,9 @@ import java.util.stream.Collectors;
 public class ComponentServiceImpl implements ComponentService {
     @Autowired
     private ComponentRepository componentRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     @Transactional
@@ -40,10 +42,21 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     @Transactional
-    public ComponentDTO addUserToComponent(String uuid, AddUserToComponentRequest user) {
-        ComponentDTO componentDTO = getComponentById(uuid);
-        Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
-        component.getUsers().addAll(user.getUsers());
+    public ComponentDTO addUserToComponent(String uuid, @NotNull AddUserToComponentRequest user) {
+        Component component = componentRepository.findById(uuid).orElse(null);
+        if (component != null){
+            component.getUsers().addAll(user
+                    .getUsers()
+                    .stream()
+                    .map(us -> {
+                        User users = us;
+                        if(users.getUuid().length() > 0){
+                            users = userRepository.findById(users.getUuid()).get();
+                        }
+                        users.setComponent(component);
+                        return users;
+                    }).collect(Collectors.toList()));
+        }
         return ComponentMapper.MAPPER.mapToComponentDTO(componentRepository.save(component));
     }
 
@@ -62,7 +75,7 @@ public class ComponentServiceImpl implements ComponentService {
     @Override
     @Transactional
     public Boolean deleteComponent(String uuid) {
-        Optional<Component> check = componentRepository.findById(uuid);
+        Component check = componentRepository.findById(uuid).orElse(null);
         if (check != null){
             componentRepository.deleteById(uuid);
             return true;

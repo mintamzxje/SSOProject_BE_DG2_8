@@ -3,7 +3,6 @@ package com.sso.service;
 import com.sso.model.User;
 import com.sso.payload.dto.ComponentDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
-import com.sso.model.Component;
 
 import java.util.List;
 import java.util.Set;
