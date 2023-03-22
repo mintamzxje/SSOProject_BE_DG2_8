@@ -25,4 +25,12 @@ public class FilesStorageService {
             throw new RuntimeException("Could not store the file. Error:" + e.getMessage());
         }
     }
+    public boolean delete(String filename, String relativePath) {
+        try {
+            Path file = convertRelativeToAbsolutePath(relativePath).resolve(filename);
+            return Files.deleteIfExists(file);
+        } catch (Exception e) {
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
 }
