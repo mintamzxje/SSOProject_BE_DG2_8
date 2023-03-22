@@ -1,6 +1,7 @@
 package com.sso.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -10,6 +11,11 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "user", uniqueConstraints = {
         @UniqueConstraint(columnNames = {
@@ -52,6 +58,7 @@ public class User {
     private String token;
     @Column(name = "token_creation_date")
     private LocalDateTime tokenCreationDate;
+
     @ManyToMany(mappedBy = "users")
     private Set<Component> components = new HashSet<>();
     public User() {
@@ -93,6 +100,7 @@ public class User {
         this.address = address;
         this.avatar = avatar;
     }
+
 
     public String getToken() {
         return token;
@@ -200,4 +208,5 @@ public class User {
     public void setComponent(Component component){
         this.components.add(component);
     }
+
 }
