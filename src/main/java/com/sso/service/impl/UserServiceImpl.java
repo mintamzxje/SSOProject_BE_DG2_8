@@ -1,5 +1,9 @@
 package com.sso.service.impl;
 
+import com.sso.exception.DuplicateRecordException;
+import com.sso.exception.NotFoundException;
+import com.sso.factory.encodepassword.MyPasswordEncoder;
+import com.sso.mapper.UserMapper;
 import com.sso.payload.dto.UserDTO;
 import com.sso.model.User;
 import com.sso.repository.UserRepository;
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,45 +27,44 @@ public class UserServiceImpl  implements UserService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private MyPasswordEncoder myPasswordEncoder;
     @Override
-    public User addUser(User user) {
-        return userRepository.save(user);
+    public UserDTO addUser(UserDTO userDTO) {
+        User user = UserMapper.MAPPER.mapToUser(userDTO);
+        user.setPassWord(myPasswordEncoder.encode(userDTO.getPassword()));
+        return UserMapper.MAPPER.mapToUserDTO(userRepository.save(user));
     }
 
     @Override
-    public User updateUser(String uuid, User user) {
+    public UserDTO updateUser(String uuid, UserDTO userDTO) {
         if(userRepository.existsById(uuid)) {
-            User user1 = userRepository.getReferenceById(uuid);
-            user1.setUserName(user.getUserName());
-            user1.setFirstName(user.getFirstName());
-            user1.setAddress(user.getAddress());
-            user1.setFullName(user.getFullName());
-            user1.setPhone(user.getPhone());
-            user1.setAvatar(user.getAvatar());
-            user1.setLastName(user.getLastName());
-            user1.setAddress(user.getAddress());
-            user1.setPassWord(user.getPassWord());
-            return userRepository.saveAndFlush(user1);
+            User user = UserMapper.MAPPER.mapToUser(userDTO);
+            User userDB = userRepository.findById(uuid).orElseThrow(() ->
+                    new RuntimeException("Find not user id: "+uuid)
+            );
+            user.setUuid(userDB.getUuid());
+            user.setPassWord(myPasswordEncoder.encode(userDTO.getPassword()));
+            return UserMapper.MAPPER.mapToUserDTO(userRepository.saveAndFlush(user));
         }
-        return null;
+        throw new NotFoundException("Find not id: "+uuid);
+    }
+
+    @Override
+    public List<UserDTO> getAll() {
+        List<User> users = userRepository.findAll();
+        if(users.isEmpty()) {
+            throw new DuplicateRecordException("users is empty");
+        }
+        return UserMapper.MAPPER.mapToUserDTOList(users);
     }
 
     @Override
     public UserDTO getOneUser(String uuid) {
-        User user = userRepository.getReferenceById(uuid);
-        UserDTO userDTO = new UserDTO(
-                user.getUuid(),
-                user.getUserName(),
-                user.getEmail(),
-                user.getPassWord(),
-                user.getFullName(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getPhone(),
-                user.getAddress(),
-                user.getAvatar()
+        User user = userRepository.findById(uuid).orElseThrow(() ->
+                new RuntimeException("Find not user id: "+uuid)
         );
-        return userDTO;
+        return UserMapper.MAPPER.mapToUserDTO(user);
     }
 
     @Override

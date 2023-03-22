@@ -7,8 +7,6 @@ import com.sso.payload.response.ResponseDTO;
 import com.sso.model.EmailDetails;
 import com.sso.model.User;
 import com.sso.service.EmailSendService;
-import com.sso.service.EncryptionMD5;
-import com.sso.service.EncryptionSalt;
 import com.sso.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,7 +14,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,15 +26,15 @@ public class UserController {
     @Autowired
     private UserService userService;
     @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private EncryptionMD5 encryptionMD5;
-    @Autowired
-    private EncryptionSalt encryptionSalt;
-    @Autowired
     private EmailSendService emailSendService;
-
     @GetMapping("/")
+    public ResponseEntity<?> getAllUser() {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseDTO(true,HttpStatus.OK,"null",userService.getAll())
+        );
+    }
+
+    @GetMapping("/id")
     public ResponseEntity<?> getOneUserDTO(@RequestParam String uuid) {
         if (!userService.existsByUuid(uuid)) {
             throw new NotFoundException("ID not found");
@@ -85,12 +82,8 @@ public class UserController {
                             "the email existed! please try again!",null)
             );
         }
-        User user = new User(userDTO.getUserName(),encryptionSalt.getSaltEncryptedValue(userDTO.getPassword()),
-                userDTO.getFullName(),userDTO.getFirstName(),userDTO.getLastName(),userDTO.getPhone(),userDTO.getEmail(),
-                userDTO.getAddress(),userDTO.getAvatar());
-        userService.addUser(user);
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO(true, HttpStatus.OK,"null",userDTO)
+                new ResponseDTO(true, HttpStatus.OK,"null",userService.addUser(userDTO))
         );
     }
     @PutMapping("/update")
@@ -98,18 +91,8 @@ public class UserController {
         if (!userService.existsByUuid(uuid)) {
             throw new NotFoundException("ID not found");
         }
-        if (userService.existsByUserName(userDTO.getUserName())) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    new ResponseDTO(false,HttpStatus.NOT_FOUND,
-                            "can't change username!",null)
-            );
-        }
-        User user = new User(userDTO.getUserName(),passwordEncoder.encode(userDTO.getPassword()),
-                userDTO.getFullName(),userDTO.getFirstName(),userDTO.getLastName(),userDTO.getPhone(),userDTO.getEmail(),
-                userDTO.getAddress(),userDTO.getAvatar());
-        userService.updateUser(uuid,user);
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO(true, HttpStatus.OK,"null",userDTO)
+                new ResponseDTO(true, HttpStatus.OK,"null",userService.updateUser(uuid,userDTO))
         );
     }
     @DeleteMapping("/")
