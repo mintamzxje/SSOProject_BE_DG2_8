@@ -1,20 +1,21 @@
 package com.sso.service.impl;
 
+import com.sso.factory.file.FilesStorageService;
 import com.sso.model.User;
 import com.sso.payload.dto.ComponentDTO;
-import com.sso.payload.dto.UserDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
 import com.sso.mapper.ComponentMapper;
 import com.sso.model.Component;
 import com.sso.repository.ComponentRepository;
 import com.sso.repository.UserRepository;
 import com.sso.service.ComponentService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,12 @@ import java.util.stream.Collectors;
 public class ComponentServiceImpl implements ComponentService {
     @Autowired
     private ComponentRepository componentRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private FilesStorageService filesStorageService;
 
     @Override
     @Transactional
@@ -32,29 +39,47 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     @Transactional
-    public ComponentDTO createComponent(ComponentDTO componentDTO) {
+    public ComponentDTO createComponent(ComponentDTO componentDTO, MultipartFile file) {
+        filesStorageService.saveAs(file, "/component/" + file.getOriginalFilename());
         Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
-        componentRepository.save(component);
-        return ComponentMapper.MAPPER.mapToComponentDTO(component);
-    }
-
-    @Override
-    @Transactional
-    public ComponentDTO addUserToComponent(String uuid, AddUserToComponentRequest user) {
-        ComponentDTO componentDTO = getComponentById(uuid);
-        Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
-        component.getUsers().addAll(user.getUsers());
+        component.setIcon(file.getOriginalFilename());
         return ComponentMapper.MAPPER.mapToComponentDTO(componentRepository.save(component));
     }
 
     @Override
     @Transactional
-    public ComponentDTO updateComponent(ComponentDTO componentDTO, String uuid) {
+    public ComponentDTO addUserToComponent(String uuid, @NotNull AddUserToComponentRequest user) {
+        Component component = componentRepository.findById(uuid).orElse(null);
+        if (component != null){
+            component.getUsers().addAll(user
+                    .getUsers()
+                    .stream()
+                    .map(us -> {
+                        User users = us;
+                        if(users.getUuid().length() > 0){
+                            users = userRepository.findById(users.getUuid()).get();
+                        }
+                        users.setComponent(component);
+                        return users;
+                    }).collect(Collectors.toList()));
+        }
+        return ComponentMapper.MAPPER.mapToComponentDTO(componentRepository.save(component));
+    }
+
+    @Override
+    @Transactional
+    public ComponentDTO updateComponent(ComponentDTO componentDTO, String uuid, MultipartFile file) {
         Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
         Component existing = componentRepository.findById(uuid).orElse(null);
         if (existing != null){
             component.setUuid(existing.getUuid());
-            return ComponentMapper.MAPPER.mapToComponentDTO(componentRepository.saveAndFlush(component));
+            if(component.getIcon() != existing.getIcon() && component.getIcon() != null)
+            {
+                filesStorageService.delete(existing.getIcon(),"/component/");
+                filesStorageService.saveAs(file, "/component/" + file.getOriginalFilename());
+                component.setIcon(file.getOriginalFilename());
+            }
+            return ComponentMapper.MAPPER.mapToComponentDTO(componentRepository.save(component));
         }
         return null;
     }
@@ -62,7 +87,7 @@ public class ComponentServiceImpl implements ComponentService {
     @Override
     @Transactional
     public Boolean deleteComponent(String uuid) {
-        Optional<Component> check = componentRepository.findById(uuid);
+        Component check = componentRepository.findById(uuid).orElse(null);
         if (check != null){
             componentRepository.deleteById(uuid);
             return true;

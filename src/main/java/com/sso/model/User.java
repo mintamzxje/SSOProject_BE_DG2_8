@@ -8,6 +8,8 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -17,7 +19,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "user", uniqueConstraints = {
         @UniqueConstraint(columnNames = {
-                "userName"
+                "username"
         }),
         @UniqueConstraint(columnNames = {
                 "email"
@@ -29,7 +31,7 @@ public class User {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String uuid;
     @Column(name = "username")
-    @NotBlank
+
     private String userName;
     @NotBlank
     @JsonIgnore
@@ -57,6 +59,28 @@ public class User {
     @Column(name = "token_creation_date")
     private LocalDateTime tokenCreationDate;
 
+    @ManyToMany(mappedBy = "users")
+    private Set<Component> components = new HashSet<>();
+    public User() {
+    }
+
+    public User(String uuid, String userName, String passWord, String fullName, String firstName, String lastName,
+                String phone, String email, String address, String avatar, String token,
+                LocalDateTime tokenCreationDate) {
+        this.uuid = uuid;
+        this.userName = userName;
+        this.passWord = passWord;
+        this.fullName = fullName;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
+        this.avatar = avatar;
+        this.token = token;
+        this.tokenCreationDate = tokenCreationDate;
+    }
+
     public User(@NotBlank String userName,
                 @NotBlank String passWord,
                 @NotBlank String fullName,
@@ -76,4 +100,113 @@ public class User {
         this.address = address;
         this.avatar = avatar;
     }
+
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public LocalDateTime getTokenCreationDate() {
+        return tokenCreationDate;
+    }
+
+    public void setTokenCreationDate(LocalDateTime tokenCreationDate) {
+        this.tokenCreationDate = tokenCreationDate;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPassWord() {
+        return passWord;
+    }
+
+    public void setPassWord(String passWord) {
+        this.passWord = passWord;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public Set<Component> getComponents() {
+        return components;
+    }
+
+    public void setComponents(Set<Component> components) {
+        this.components = components;
+    }
+    public void setComponent(Component component){
+        this.components.add(component);
+    }
+
 }

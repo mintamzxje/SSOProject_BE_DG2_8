@@ -1,7 +1,6 @@
 package com.sso.controller;
 
 import com.sso.doc.MailMergeNotification;
-import com.sso.exception.NotFoundException;
 import com.sso.payload.dto.ComponentDTO;
 import com.sso.payload.response.ResponseDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
@@ -15,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -47,19 +47,21 @@ public class ComponentController {
                 new ResponseDTO(true, HttpStatus.OK, "", componentService.getComponentById(id))
         );
     }
-    @PostMapping("/create")
+    @PutMapping(value = "/create", consumes = "multipart/form-data")
     @ApiOperation(value = "Create New Component", response = ResponseEntity.class)
-    public ResponseEntity<?> createNewComponent(@RequestBody ComponentDTO componentRequest){
+    public ResponseEntity<?> createNewComponent(@ModelAttribute ComponentDTO componentRequest,
+                                                @RequestPart(name = "file") MultipartFile file){
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ResponseDTO(true, HttpStatus.CREATED, "",
-                        componentService.createComponent(componentRequest))
+                        componentService.createComponent(componentRequest, file))
         );
     }
-    @PutMapping("/update/{id}")
+    @PostMapping(value = "/update/{id}", consumes = "multipart/form-data")
     @ApiOperation(value = "Update Component", response = ResponseEntity.class)
     public ResponseEntity<?> updateComponent(@PathVariable(name = "id") String id,
-                                             @RequestBody ComponentDTO componentRequest){
-        if(componentService.updateComponent(componentRequest, id) != null){
+                                             @ModelAttribute ComponentDTO componentRequest,
+                                             @RequestPart(name = "file") MultipartFile file){
+        if(componentService.updateComponent(componentRequest, id, file) != null){
             ComponentDTO componentDTO = componentService.getComponentById(id);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseDTO(true, HttpStatus.OK, "", componentDTO)
@@ -73,6 +75,12 @@ public class ComponentController {
     @DeleteMapping("/delete/{id}")
     @ApiOperation(value = "Delete Component", response = ResponseEntity.class)
     public ResponseEntity<?> deleteComponent(@PathVariable(name = "id") String id){
+        if(!componentService.existsById(id))
+        {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ResponseDTO(false, HttpStatus.BAD_REQUEST, "ID Not Found", null)
+            );
+        }
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "", componentService.deleteComponent(id))
         );
@@ -82,7 +90,8 @@ public class ComponentController {
     public ResponseEntity<?> addUserToComponent(@PathVariable(name = "id") String id,
                                                 @RequestBody AddUserToComponentRequest user){
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO(true, HttpStatus.OK, "null",componentService.addUserToComponent(id, user))
+                new ResponseDTO(true, HttpStatus.OK, "null",
+                        componentService.addUserToComponent(id, user))
         );
     }
     @GetMapping("/get-list-component-for-user/{id}")
@@ -98,8 +107,8 @@ public class ComponentController {
     public ResponseEntity<?> getListUserInComponent(@PathVariable(name = "id") String id){
         if(!componentService.existsById(id))
         {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-              new ResponseDTO(false, HttpStatus.NOT_FOUND, "ID Not Found", null)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+              new ResponseDTO(false, HttpStatus.BAD_REQUEST, "ID Not Found", null)
             );
         }
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -120,7 +129,6 @@ public class ComponentController {
             String headerKey = "Content-Disposition";
             String headerValue = "attachment; filename=list-component.pdf";
             headers.set(headerKey, headerValue);
-
             return ResponseEntity.ok().headers(headers).contentLength(file.length())
                     .contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
         } finally {
