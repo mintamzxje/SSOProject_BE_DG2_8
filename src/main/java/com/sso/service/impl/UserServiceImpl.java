@@ -3,6 +3,7 @@ package com.sso.service.impl;
 import com.sso.exception.DuplicateRecordException;
 import com.sso.exception.NotFoundException;
 import com.sso.factory.encodepassword.MyPasswordEncoder;
+import com.sso.factory.file.FilesStorageService;
 import com.sso.mapper.UserMapper;
 import com.sso.payload.dto.UserDTO;
 import com.sso.model.User;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -29,21 +31,36 @@ public class UserServiceImpl  implements UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private MyPasswordEncoder myPasswordEncoder;
+    @Autowired
+    private FilesStorageService filesStorageService;
     @Override
-    public UserDTO addUser(UserDTO userDTO) {
+    public UserDTO addUser(UserDTO userDTO, MultipartFile file) {
         User user = UserMapper.MAPPER.mapToUser(userDTO);
+        if(file.getOriginalFilename() != null) {
+            filesStorageService.delete(file.getOriginalFilename(),"/users/");
+        }
+        filesStorageService.saveAs(file, "/users/" + file.getOriginalFilename());
+        user.setAvatar(file.getOriginalFilename());
         user.setPassWord(myPasswordEncoder.encode(userDTO.getPassword()));
         return UserMapper.MAPPER.mapToUserDTO(userRepository.save(user));
     }
 
     @Override
-    public UserDTO updateUser(String uuid, UserDTO userDTO) {
+    public UserDTO updateUser(String uuid, UserDTO userDTO, MultipartFile file) {
         if(userRepository.existsById(uuid)) {
             User user = UserMapper.MAPPER.mapToUser(userDTO);
             User userDB = userRepository.findById(uuid).orElseThrow(() ->
                     new RuntimeException("Find not user id: "+uuid)
             );
+
+            if(file.getOriginalFilename().equals(userDB.getAvatar())) {
+                filesStorageService.delete(userDB.getAvatar(),"/users/");
+            } else {
+                filesStorageService.delete(file.getOriginalFilename(), "/users/");
+            }
+            filesStorageService.saveAs(file, "/users/"+file.getOriginalFilename());
             user.setUuid(userDB.getUuid());
+            user.setAvatar(file.getOriginalFilename());
             user.setPassWord(myPasswordEncoder.encode(userDTO.getPassword()));
             return UserMapper.MAPPER.mapToUserDTO(userRepository.saveAndFlush(user));
         }
