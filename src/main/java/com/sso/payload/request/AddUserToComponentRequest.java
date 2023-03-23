@@ -1,5 +1,8 @@
 package com.sso.payload.request;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.sso.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;

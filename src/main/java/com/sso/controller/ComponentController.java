@@ -1,6 +1,7 @@
 package com.sso.controller;
 
 import com.sso.doc.MailMergeNotification;
+import com.sso.exception.NotFoundException;
 import com.sso.payload.dto.ComponentDTO;
 import com.sso.payload.response.ResponseDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
@@ -44,9 +45,7 @@ public class ComponentController {
 
         if(!componentService.existsById(uuid))
         {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    new ResponseDTO(false, HttpStatus.NOT_FOUND, "UUID Not Found", null)
-            );
+            throw new NotFoundException("UUID Not Found");
         }
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "", componentService.getComponentById(uuid))
@@ -81,9 +80,7 @@ public class ComponentController {
                     new ResponseDTO(true, HttpStatus.OK, "", componentDTO)
             );
         }else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ResponseDTO(false, HttpStatus.BAD_REQUEST, "UUID Not Found", uuid)
-            );
+            throw new NotFoundException("UUID Not Found");
         }
     }
     @DeleteMapping("/delete/{uuid}")
@@ -94,20 +91,18 @@ public class ComponentController {
 
         if(!componentService.existsById(uuid))
         {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ResponseDTO(false, HttpStatus.BAD_REQUEST, "UUID Not Found", null)
-            );
+            throw new NotFoundException("UUID Not Found");
         }
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "", componentService.deleteComponent(uuid))
         );
     }
-    @PostMapping("/{uuid}/adduser")
+    @PostMapping(value = "/{uuid}/adduser", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Add User To Component", response = ResponseEntity.class)
     public ResponseEntity<?> addUserToComponent(
             @ApiParam(value = "UUID of the Component", required = true)
             @PathVariable(name = "uuid") String uuid,
-            @ApiParam(value = "The user object that needs to be add ", required = true)
+            @ApiParam(value = "The user object that needs to be add ")
             @RequestBody AddUserToComponentRequest user){
 
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -134,9 +129,7 @@ public class ComponentController {
 
         if(!componentService.existsById(uuid))
         {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-              new ResponseDTO(false, HttpStatus.BAD_REQUEST, "UUID Not Found", null)
-            );
+            throw new NotFoundException("UUID Not Found");
         }
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "",
