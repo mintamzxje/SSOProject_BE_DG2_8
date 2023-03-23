@@ -1,5 +1,7 @@
 package com.sso.service.impl;
 
+import com.sso.exception.DuplicateRecordException;
+import com.sso.exception.NotFoundException;
 import com.sso.factory.file.FilesStorageService;
 import com.sso.model.User;
 import com.sso.payload.dto.ComponentDTO;
@@ -40,7 +42,10 @@ public class ComponentServiceImpl implements ComponentService {
     @Override
     @Transactional
     public ComponentDTO createComponent(ComponentDTO componentDTO, MultipartFile file) {
-
+        String contentType = file.getContentType();
+        if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
+            throw new DuplicateRecordException("Only JPG and PNG images are supported");
+        }
         Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
         String originalFilename = file.getOriginalFilename();
         String newFilename = component.getName() + filesStorageService.getFileExtension(originalFilename);

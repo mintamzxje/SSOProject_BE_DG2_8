@@ -16,7 +16,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(DuplicateRecordException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handlerDuplicateRecordException(NotFoundException ex, WebRequest req) {
+    public ErrorResponse handlerDuplicateRecordException(DuplicateRecordException ex, WebRequest req) {
         return new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 }
