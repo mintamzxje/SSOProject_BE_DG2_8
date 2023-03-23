@@ -56,7 +56,7 @@ public class User {
     private LocalDateTime tokenCreationDate;
 
     @ManyToMany(mappedBy = "users")
-    @JsonBackReference
+    @JsonIgnore
     private Set<Component> components = new HashSet<>();
 
     public User(){

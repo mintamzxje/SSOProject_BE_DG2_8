@@ -35,8 +35,11 @@ public class ComponentServiceImpl implements ComponentService {
     @Override
     @Transactional
     public List<ComponentDTO> getAllComponent() {
-        List<Component> component = componentRepository.findAll();
-        return ComponentMapper.MAPPER.mapListToComponentDTO(component);
+        List<Component> components = componentRepository.findAll();
+        if(components.isEmpty()) {
+            throw new NotFoundException("Component is empty");
+        }
+        return ComponentMapper.MAPPER.mapListToComponentDTO(components);
     }
 
     @Override
@@ -56,7 +59,7 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     @Transactional
-    public ComponentDTO addUserToComponent(String uuid, @NotNull AddUserToComponentRequest user) {
+    public ComponentDTO addUserToComponent(String uuid, AddUserToComponentRequest user) {
         Component component = componentRepository.findById(uuid).orElse(null);
         if (component != null){
             component.getUsers().addAll(user
@@ -77,11 +80,15 @@ public class ComponentServiceImpl implements ComponentService {
     @Override
     @Transactional
     public ComponentDTO updateComponent(ComponentDTO componentDTO, String uuid, MultipartFile file) {
+        String contentType = file.getContentType();
+        if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
+            throw new DuplicateRecordException("Only JPG and PNG images are supported");
+        }
         Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
         Component existing = componentRepository.findById(uuid).orElse(null);
         if (existing != null){
             component.setUuid(existing.getUuid());
-            if(component.getIcon() != existing.getIcon() && component.getIcon() != null)
+            if(!component.getIcon().equals(existing.getIcon()) && component.getIcon() != null)
             {
                 filesStorageService.delete(existing.getIcon(),"/component/");
                 String originalFilename = file.getOriginalFilename();
@@ -98,7 +105,7 @@ public class ComponentServiceImpl implements ComponentService {
     @Transactional
     public Boolean deleteComponent(String uuid) {
         Component check = componentRepository.findById(uuid).orElse(null);
-        if (check != null){
+        if (!check.equals(null)){
             filesStorageService.delete(check.getIcon(),"/component/");
             componentRepository.deleteById(check.getUuid());
             return true;

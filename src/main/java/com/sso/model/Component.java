@@ -1,5 +1,6 @@
 package com.sso.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -35,6 +36,6 @@ public class Component {
     @JoinTable(name = "user_component",
             joinColumns = @JoinColumn(name = "component_uuid"),
             inverseJoinColumns = @JoinColumn(name = "user_uuid"))
-    @JsonManagedReference
+    @JsonIgnore
     private Set<User> users = new HashSet<>();
 }
