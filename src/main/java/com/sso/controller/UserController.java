@@ -1,5 +1,6 @@
 package com.sso.controller;
 
+import com.sso.exception.DuplicateRecordException;
 import com.sso.exception.NotFoundException;
 import com.sso.payload.dto.UserDTO;
 import com.sso.payload.response.ResponseDTO;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -69,7 +71,12 @@ public class UserController {
         }
     }
     @PostMapping("/add")
-    public ResponseEntity<?> add(@Valid @RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> add(@Valid @ModelAttribute UserDTO userDTO,
+                                 @RequestPart(name = "file") MultipartFile file) {
+        String contentType = file.getContentType();
+        if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
+            throw new NotFoundException("Only JPG and PNG images are supported");
+        }
         if (userService.existsByUserName(userDTO.getUserName())) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ResponseDTO(false,HttpStatus.NOT_FOUND,
@@ -83,16 +90,19 @@ public class UserController {
             );
         }
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO(true, HttpStatus.OK,"null",userService.addUser(userDTO))
+                new ResponseDTO(true, HttpStatus.OK,"null",userService.addUser(userDTO,file))
         );
     }
     @PutMapping("/update")
-    public ResponseEntity<?> update(@RequestParam String uuid, @RequestBody UserDTO userDTO) {
-        if (!userService.existsByUuid(uuid)) {
-            throw new NotFoundException("ID not found");
+    public ResponseEntity<?> update(@RequestParam String uuid, @ModelAttribute UserDTO userDTO,
+                                    @RequestPart MultipartFile file) {
+        String contentType = file.getContentType();
+        if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
+            throw new NotFoundException("Only JPG and PNG images are supported");
         }
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO(true, HttpStatus.OK,"null",userService.updateUser(uuid,userDTO))
+                new ResponseDTO(true, HttpStatus.OK,"null",userService.updateUser(uuid,userDTO,
+                        file))
         );
     }
     @DeleteMapping("/")
