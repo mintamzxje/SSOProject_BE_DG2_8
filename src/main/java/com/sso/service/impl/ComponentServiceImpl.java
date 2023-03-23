@@ -89,7 +89,8 @@ public class ComponentServiceImpl implements ComponentService {
     public Boolean deleteComponent(String uuid) {
         Component check = componentRepository.findById(uuid).orElse(null);
         if (check != null){
-            componentRepository.deleteById(uuid);
+            filesStorageService.delete(check.getIcon(),"/component/");
+            componentRepository.deleteById(check.getUuid());
             return true;
         }
         return false;

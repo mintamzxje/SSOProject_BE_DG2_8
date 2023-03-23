@@ -6,6 +6,7 @@ import com.sso.payload.response.ResponseDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
 import com.sso.service.impl.ComponentServiceImpl;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -34,91 +35,111 @@ public class ComponentController {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "", componentService.getAllComponent()));
     }
-    @GetMapping("/{id}")
-    @ApiOperation(value = "Get Component By Id", response = ResponseEntity.class)
-    public ResponseEntity<?> getComponentById(@PathVariable(name = "id") String id){
-        if(!componentService.existsById(id))
+    @GetMapping("/{uuid}")
+    @ApiOperation(value = "Get Component By UUID", response = ResponseEntity.class)
+    public ResponseEntity<?> getComponentByUUID(
+            @ApiParam(value = "UUID of the Component", required = true)
+            @PathVariable(name = "uuid") String uuid){
+        if(!componentService.existsById(uuid))
         {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    new ResponseDTO(false, HttpStatus.NOT_FOUND, "ID Not Found", null)
+                    new ResponseDTO(false, HttpStatus.NOT_FOUND, "UUID Not Found", null)
             );
         }
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO(true, HttpStatus.OK, "", componentService.getComponentById(id))
+                new ResponseDTO(true, HttpStatus.OK, "", componentService.getComponentById(uuid))
         );
     }
-    @PutMapping(value = "/create", consumes = "multipart/form-data")
+    @PostMapping(value = "/create", consumes = "multipart/form-data")
     @ApiOperation(value = "Create New Component", response = ResponseEntity.class)
-    public ResponseEntity<?> createNewComponent(@ModelAttribute ComponentDTO componentRequest,
-                                                @RequestPart(name = "file") MultipartFile file){
+    public ResponseEntity<?> createNewComponent(
+            @ApiParam(value = "The component object that needs to be created ", required = true)
+            @ModelAttribute ComponentDTO componentRequest,
+            @ApiParam(value = "Icon of the Component", required = true)
+            @RequestPart(name = "file") MultipartFile file){
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ResponseDTO(true, HttpStatus.CREATED, "",
                         componentService.createComponent(componentRequest, file))
         );
     }
-    @PostMapping(value = "/update/{id}", consumes = "multipart/form-data")
+    @PutMapping(value = "/update/{uuid}", consumes = "multipart/form-data")
     @ApiOperation(value = "Update Component", response = ResponseEntity.class)
-    public ResponseEntity<?> updateComponent(@PathVariable(name = "id") String id,
-                                             @ModelAttribute ComponentDTO componentRequest,
-                                             @RequestPart(name = "file") MultipartFile file){
-        if(componentService.updateComponent(componentRequest, id, file) != null){
-            ComponentDTO componentDTO = componentService.getComponentById(id);
+    public ResponseEntity<?> updateComponent(
+            @ApiParam(value = "UUID of the Component", required = true)
+            @PathVariable(name = "uuid") String uuid,
+            @ApiParam(value = "The component object that needs to be created ", required = true)
+            @ModelAttribute ComponentDTO componentRequest,
+            @ApiParam(value = "Icon of the Component", required = true)
+            @RequestPart(name = "file") MultipartFile file){
+        if(componentService.updateComponent(componentRequest, uuid, file) != null){
+            ComponentDTO componentDTO = componentService.getComponentById(uuid);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseDTO(true, HttpStatus.OK, "", componentDTO)
             );
         }else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ResponseDTO(false, HttpStatus.BAD_REQUEST, "ID Not Found", id)
+                    new ResponseDTO(false, HttpStatus.BAD_REQUEST, "UUID Not Found", uuid)
             );
         }
     }
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/{uuid}")
     @ApiOperation(value = "Delete Component", response = ResponseEntity.class)
-    public ResponseEntity<?> deleteComponent(@PathVariable(name = "id") String id){
-        if(!componentService.existsById(id))
+    public ResponseEntity<?> deleteComponent(
+            @ApiParam(value = "UUID of the Component", required = true)
+            @PathVariable(name = "uuid") String uuid){
+        if(!componentService.existsById(uuid))
         {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ResponseDTO(false, HttpStatus.BAD_REQUEST, "ID Not Found", null)
+                    new ResponseDTO(false, HttpStatus.BAD_REQUEST, "UUID Not Found", null)
             );
         }
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO(true, HttpStatus.OK, "", componentService.deleteComponent(id))
+                new ResponseDTO(true, HttpStatus.OK, "", componentService.deleteComponent(uuid))
         );
     }
-    @PostMapping("/{id}/adduser")
+    @PostMapping("/{uuid}/adduser")
     @ApiOperation(value = "Add User To Component", response = ResponseEntity.class)
-    public ResponseEntity<?> addUserToComponent(@PathVariable(name = "id") String id,
-                                                @RequestBody AddUserToComponentRequest user){
+    public ResponseEntity<?> addUserToComponent(
+            @ApiParam(value = "UUID of the Component", required = true)
+            @PathVariable(name = "uuid") String uuid,
+            @ApiParam(value = "The user object that needs to be add ", required = true)
+            @RequestBody AddUserToComponentRequest user){
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "null",
-                        componentService.addUserToComponent(id, user))
+                        componentService.addUserToComponent(uuid, user))
         );
     }
-    @GetMapping("/get-list-component-for-user/{id}")
+    @GetMapping("/get-list-component-for-user/{uuid}")
     @ApiOperation(value = "Get All List Components For User", response = ResponseEntity.class)
-    public ResponseEntity<?> getListComponentByUserUuid(@PathVariable(name = "id") String id){
+    public ResponseEntity<?> getListComponentByUserUuid(
+            @ApiParam(value = "UUID of the User", required = true)
+            @PathVariable(name = "uuid") String uuid){
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "",
-                        componentService.getComponentByUserUuid(id))
+                        componentService.getComponentByUserUuid(uuid))
         );
     }
-    @GetMapping("/get-list-user-in-component/{id}")
+    @GetMapping("/get-list-user-in-component/{uuid}")
     @ApiOperation(value = "Get All List User For Component", response = ResponseEntity.class)
-    public ResponseEntity<?> getListUserInComponent(@PathVariable(name = "id") String id){
-        if(!componentService.existsById(id))
+    public ResponseEntity<?> getListUserInComponent(
+            @ApiParam(value = "UUID of the Component", required = true)
+            @PathVariable(name = "uuid") String uuid){
+        if(!componentService.existsById(uuid))
         {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-              new ResponseDTO(false, HttpStatus.BAD_REQUEST, "ID Not Found", null)
+              new ResponseDTO(false, HttpStatus.BAD_REQUEST, "UUID Not Found", null)
             );
         }
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "",
-                        componentService.getAllUserInComponent(id))
+                        componentService.getAllUserInComponent(uuid))
         );
     }
-    @PostMapping("/mailMergeNotification/{id}")
+    @PostMapping("/mailMergeNotification/{uuid}")
     @ApiOperation(value = "Mail Merge Notification List Component For User", response = ResponseEntity.class)
-    public ResponseEntity<Resource> mailMergeNotification(@PathVariable(name = "id") String uuid) throws Exception {
+    public ResponseEntity<Resource> mailMergeNotification(
+            @ApiParam(value = "UUID of the User", required = true)
+            @PathVariable(name = "uuid") String uuid) throws Exception {
         String pdfPath = "";
         try {
             pdfPath = mailMergeNotification.MailMergeData(uuid);

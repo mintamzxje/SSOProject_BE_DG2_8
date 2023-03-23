@@ -29,7 +29,6 @@ public class Component {
     @NotBlank
     private String code;
     @Column
-    @NotBlank
     private String icon;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

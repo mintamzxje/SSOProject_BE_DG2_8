@@ -61,8 +61,6 @@ public class User {
 
     @ManyToMany(mappedBy = "users")
     private Set<Component> components = new HashSet<>();
-    public User() {
-    }
 
     public User(String uuid, String userName, String passWord, String fullName, String firstName, String lastName,
                 String phone, String email, String address, String avatar, String token,
