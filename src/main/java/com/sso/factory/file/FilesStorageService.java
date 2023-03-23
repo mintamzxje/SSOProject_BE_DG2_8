@@ -33,4 +33,7 @@ public class FilesStorageService {
             throw new RuntimeException("Error: " + e.getMessage());
         }
     }
+    public String getFileExtension(String filename) {
+        return filename.substring(filename.lastIndexOf("."));
+    }
 }

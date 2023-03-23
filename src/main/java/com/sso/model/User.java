@@ -1,5 +1,6 @@
 package com.sso.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -11,11 +12,6 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
 @Entity
 @Table(name = "user", uniqueConstraints = {
         @UniqueConstraint(columnNames = {
@@ -60,7 +56,12 @@ public class User {
     private LocalDateTime tokenCreationDate;
 
     @ManyToMany(mappedBy = "users")
+    @JsonBackReference
     private Set<Component> components = new HashSet<>();
+
+    public User(){
+
+    }
 
     public User(String uuid, String userName, String passWord, String fullName, String firstName, String lastName,
                 String phone, String email, String address, String avatar, String token,

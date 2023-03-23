@@ -40,9 +40,12 @@ public class ComponentServiceImpl implements ComponentService {
     @Override
     @Transactional
     public ComponentDTO createComponent(ComponentDTO componentDTO, MultipartFile file) {
-        filesStorageService.saveAs(file, "/component/" + file.getOriginalFilename());
+
         Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
-        component.setIcon(file.getOriginalFilename());
+        String originalFilename = file.getOriginalFilename();
+        String newFilename = component.getName() + filesStorageService.getFileExtension(originalFilename);
+        filesStorageService.saveAs(file, "/component/" + newFilename);
+        component.setIcon(newFilename);
         return ComponentMapper.MAPPER.mapToComponentDTO(componentRepository.save(component));
     }
 
@@ -76,8 +79,10 @@ public class ComponentServiceImpl implements ComponentService {
             if(component.getIcon() != existing.getIcon() && component.getIcon() != null)
             {
                 filesStorageService.delete(existing.getIcon(),"/component/");
-                filesStorageService.saveAs(file, "/component/" + file.getOriginalFilename());
-                component.setIcon(file.getOriginalFilename());
+                String originalFilename = file.getOriginalFilename();
+                String newFilename = component.getName() + filesStorageService.getFileExtension(originalFilename);
+                filesStorageService.saveAs(file, "/component/" + newFilename);
+                component.setIcon(newFilename);
             }
             return ComponentMapper.MAPPER.mapToComponentDTO(componentRepository.save(component));
         }

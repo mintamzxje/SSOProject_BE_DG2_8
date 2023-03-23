@@ -32,6 +32,7 @@ public class ComponentController {
     @GetMapping("/all")
     @ApiOperation(value = "Get All Component", response = ResponseEntity.class)
     public ResponseEntity<?> getAllComponent(){
+
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "", componentService.getAllComponent()));
     }
@@ -40,6 +41,7 @@ public class ComponentController {
     public ResponseEntity<?> getComponentByUUID(
             @ApiParam(value = "UUID of the Component", required = true)
             @PathVariable(name = "uuid") String uuid){
+
         if(!componentService.existsById(uuid))
         {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
@@ -57,6 +59,7 @@ public class ComponentController {
             @ModelAttribute ComponentDTO componentRequest,
             @ApiParam(value = "Icon of the Component", required = true)
             @RequestPart(name = "file") MultipartFile file){
+
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ResponseDTO(true, HttpStatus.CREATED, "",
                         componentService.createComponent(componentRequest, file))
@@ -71,6 +74,7 @@ public class ComponentController {
             @ModelAttribute ComponentDTO componentRequest,
             @ApiParam(value = "Icon of the Component", required = true)
             @RequestPart(name = "file") MultipartFile file){
+
         if(componentService.updateComponent(componentRequest, uuid, file) != null){
             ComponentDTO componentDTO = componentService.getComponentById(uuid);
             return ResponseEntity.status(HttpStatus.OK).body(
@@ -87,6 +91,7 @@ public class ComponentController {
     public ResponseEntity<?> deleteComponent(
             @ApiParam(value = "UUID of the Component", required = true)
             @PathVariable(name = "uuid") String uuid){
+
         if(!componentService.existsById(uuid))
         {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
@@ -104,6 +109,7 @@ public class ComponentController {
             @PathVariable(name = "uuid") String uuid,
             @ApiParam(value = "The user object that needs to be add ", required = true)
             @RequestBody AddUserToComponentRequest user){
+
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "null",
                         componentService.addUserToComponent(uuid, user))
@@ -114,6 +120,7 @@ public class ComponentController {
     public ResponseEntity<?> getListComponentByUserUuid(
             @ApiParam(value = "UUID of the User", required = true)
             @PathVariable(name = "uuid") String uuid){
+
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "",
                         componentService.getComponentByUserUuid(uuid))
@@ -124,6 +131,7 @@ public class ComponentController {
     public ResponseEntity<?> getListUserInComponent(
             @ApiParam(value = "UUID of the Component", required = true)
             @PathVariable(name = "uuid") String uuid){
+
         if(!componentService.existsById(uuid))
         {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
@@ -140,6 +148,7 @@ public class ComponentController {
     public ResponseEntity<Resource> mailMergeNotification(
             @ApiParam(value = "UUID of the User", required = true)
             @PathVariable(name = "uuid") String uuid) throws Exception {
+
         String pdfPath = "";
         try {
             pdfPath = mailMergeNotification.MailMergeData(uuid);
