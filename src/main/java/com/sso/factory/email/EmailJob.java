@@ -15,13 +15,13 @@ import org.springframework.stereotype.Component;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 @Component
 public class EmailJob extends QuartzJobBean {
     private static final Logger logger = LoggerFactory.getLogger(EmailJob.class);
     @Autowired
     private JavaMailSender mailSender;
-
     @Autowired
     private MailProperties mailProperties;
     @Override
@@ -29,13 +29,13 @@ public class EmailJob extends QuartzJobBean {
         logger.info("Executing Job with key {}", context.getJobDetail().getKey());
 
         JobDataMap jobDataMap = context.getMergedJobDataMap();
+        String[] cc = (String[]) context.getMergedJobDataMap().get("cc");
         String subject = jobDataMap.getString("subject");
         String body = jobDataMap.getString("msgBody");
         String recipientEmail = jobDataMap.getString("recipient");
-
-        sendMail(mailProperties.getUsername(), recipientEmail, subject, body);
+        sendMail(mailProperties.getUsername(), recipientEmail, subject, body, cc);
     }
-    private void sendMail(String fromEmail, String toEmail, String subject, String body) {
+    private void sendMail(String fromEmail, String toEmail, String subject, String body, String[] cc) {
         try {
             logger.info("Sending Email to {}", toEmail);
             MimeMessage message = mailSender.createMimeMessage();
@@ -44,6 +44,7 @@ public class EmailJob extends QuartzJobBean {
             messageHelper.setSubject(subject);
             messageHelper.setText(body, true);
             messageHelper.setFrom(fromEmail);
+            messageHelper.setCc(cc);
             messageHelper.setTo(toEmail);
 
             mailSender.send(message);

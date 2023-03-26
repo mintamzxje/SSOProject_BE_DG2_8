@@ -30,6 +30,7 @@ public class EmailSendServiceImpl implements EmailSendService {
         try {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setFrom(sender);
+            mailMessage.setCc(emailDetails.getCc());
             mailMessage.setTo(emailDetails.getRecipient());
             mailMessage.setText(emailDetails.getMsgBody());
             mailMessage.setSubject(emailDetails.getSubject());
@@ -77,6 +78,7 @@ public class EmailSendServiceImpl implements EmailSendService {
         JobDataMap jobDataMap = new JobDataMap();
 
         jobDataMap.put("recipient", emailDetails.getRecipient());
+        jobDataMap.put("cc", emailDetails.getCc());
         jobDataMap.put("subject", emailDetails.getSubject());
         jobDataMap.put("msgBody", emailDetails.getMsgBody());
         return JobBuilder.newJob(EmailJob.class)
