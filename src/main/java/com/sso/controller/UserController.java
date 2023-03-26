@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/id")
-    public ResponseEntity<?> getOneUserDTO(@RequestParam String uuid) {
+    public ResponseEntity<?> getOneUserDTO(@RequestParam("id") String uuid) {
         if (!userService.existsByUuid(uuid)) {
             throw new NotFoundException("ID not found");
         }
@@ -71,11 +71,11 @@ public class UserController {
         }
     }
     @PostMapping("/add")
-    public ResponseEntity<?> add(@Valid @ModelAttribute UserDTO userDTO,
-                                 @RequestPart(name = "file") MultipartFile file) {
+    public ResponseEntity<?> add(@Valid @RequestBody UserDTO userDTO,
+                                 @RequestParam(name = "file") MultipartFile file) {
         String contentType = file.getContentType();
         if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
-            throw new NotFoundException("Only JPG and PNG images are supported");
+            throw new DuplicateRecordException("Only JPG and PNG images are supported");
         }
         if (userService.existsByUserName(userDTO.getUserName())) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
@@ -94,11 +94,11 @@ public class UserController {
         );
     }
     @PutMapping("/update")
-    public ResponseEntity<?> update(@RequestParam String uuid, @ModelAttribute UserDTO userDTO,
-                                    @RequestPart MultipartFile file) {
+    public ResponseEntity<?> update(@RequestParam("id") String uuid, @RequestBody UserDTO userDTO,
+                                    @RequestParam("file") MultipartFile file) {
         String contentType = file.getContentType();
         if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
-            throw new NotFoundException("Only JPG and PNG images are supported");
+            throw new DuplicateRecordException("Only JPG and PNG images are supported");
         }
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK,"null",userService.updateUser(uuid,userDTO,
@@ -106,7 +106,7 @@ public class UserController {
         );
     }
     @DeleteMapping("/")
-    public ResponseEntity<?> delete( @RequestParam String uuid) {
+    public ResponseEntity<?> delete(@RequestParam String uuid) {
         if (!userService.existsByUuid(uuid)) {
             throw new NotFoundException("ID not found");
         }
@@ -136,7 +136,7 @@ public class UserController {
         }
     }
     @PutMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestParam String password) {
+    public ResponseEntity<?> resetPassword(@RequestParam("token") String token, @RequestParam("password") String password) {
         String response = userService.resetPassword(token,password);
         if(response.startsWith("Invalid")) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(

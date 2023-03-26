@@ -22,6 +22,7 @@ public class EmailDetails {
     @NotEmpty
     private String subject;
     private String attachment;
+    private String[] cc;
     @NotNull
     private LocalDateTime dateTime;
     @NotNull
