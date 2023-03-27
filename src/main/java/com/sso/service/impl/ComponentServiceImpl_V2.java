@@ -18,9 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
-public class V2__ComponentServiceImpl implements ComponentService {
+public class ComponentServiceImpl_V2 implements ComponentService {
     @Autowired
     private ComponentRepository componentRepository;
 
@@ -34,7 +35,7 @@ public class V2__ComponentServiceImpl implements ComponentService {
     public List<ComponentDTO> getAllComponent() {
         List<Component> components = componentRepository.findAll();
         if(components.isEmpty()){
-            throw new NotFoundException("Component is empty");
+            throw new NotFoundException("Component Is Empty");
         }
         return ComponentMapper.MAPPER.mapListToComponentDTO(components);
     }
@@ -57,7 +58,25 @@ public class V2__ComponentServiceImpl implements ComponentService {
     @Override
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
     public ComponentDTO addUserToComponent(String uuid, AddUserToComponentRequest user) {
-        return null;
+        Component component = componentRepository.findById(uuid)
+                .orElseThrow(() -> new NotFoundException("Component Not Found")
+        );
+        component.getUsers().addAll(user
+                .getUsers()
+                .stream()
+                .map(us -> {
+                    User users = us;
+                    if(users.getUuid().length() > 0){
+                        users = userRepository.findById(users.getUuid())
+                                .orElseThrow(() -> new NotFoundException("User Not Found"));
+                        users.setComponent(component);
+                        return users;
+                    }
+                    else {
+                        throw new DuplicateRecordException("UUID Cannot Be Left Blank");
+                    }
+                }).collect(Collectors.toList()));
+        return ComponentMapper.MAPPER.mapToComponentDTO(componentRepository.save(component));
     }
 
     @Override
@@ -67,13 +86,27 @@ public class V2__ComponentServiceImpl implements ComponentService {
         if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
             throw new DuplicateRecordException("Only JPG and PNG images are supported");
         }
-        return null;
+        Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
+        Component existing = componentRepository.findById(uuid)
+                .orElseThrow(() -> new NotFoundException("Component Not Found"));
+
+        component.setUuid(existing.getUuid());
+        if(!component.getIcon().equals(existing.getIcon()) && component.getIcon() != null)
+        {
+            filesStorageService.delete(existing.getIcon(),"/component/");
+            String originalFilename = file.getOriginalFilename();
+            String newFilename = component.getName() + filesStorageService.getFileExtension(originalFilename);
+            filesStorageService.saveAs(file, "/component/" + newFilename);
+            component.setIcon(newFilename);
+        }
+        return ComponentMapper.MAPPER.mapToComponentDTO(componentRepository.save(component));
     }
 
     @Override
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
     public Boolean deleteComponent(String uuid) {
-        Component exists = componentRepository.findById(uuid).orElse(null);
+        Component exists = componentRepository.findById(uuid)
+                .orElseThrow(() -> new NotFoundException("Component Not Found"));
         if (exists != null)
         {
             filesStorageService.delete(exists.getIcon(),"/component/");
