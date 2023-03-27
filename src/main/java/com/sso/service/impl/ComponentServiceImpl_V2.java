@@ -3,26 +3,25 @@ package com.sso.service.impl;
 import com.sso.exception.DuplicateRecordException;
 import com.sso.exception.NotFoundException;
 import com.sso.factory.file.FilesStorageService;
+import com.sso.mapper.ComponentMapper;
+import com.sso.model.Component;
 import com.sso.model.User;
 import com.sso.payload.dto.ComponentDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
-import com.sso.mapper.ComponentMapper;
-import com.sso.model.Component;
 import com.sso.repository.ComponentRepository;
 import com.sso.repository.UserRepository;
 import com.sso.service.ComponentService;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class ComponentServiceImpl implements ComponentService {
+public class ComponentServiceImpl_V2 implements ComponentService {
     @Autowired
     private ComponentRepository componentRepository;
 
@@ -33,17 +32,16 @@ public class ComponentServiceImpl implements ComponentService {
     private FilesStorageService filesStorageService;
 
     @Override
-    @Transactional
     public List<ComponentDTO> getAllComponent() {
         List<Component> components = componentRepository.findAll();
-        if(components.isEmpty()) {
-            throw new NotFoundException("Component is empty");
+        if(components.isEmpty()){
+            throw new NotFoundException("Component Is Empty");
         }
         return ComponentMapper.MAPPER.mapListToComponentDTO(components);
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Throwable.class})
     public ComponentDTO createComponent(ComponentDTO componentDTO, MultipartFile file) {
         String contentType = file.getContentType();
         if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
@@ -58,78 +56,88 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Throwable.class})
     public ComponentDTO addUserToComponent(String uuid, AddUserToComponentRequest user) {
-        Component component = componentRepository.findById(uuid).orElse(null);
-        if (component != null){
-            component.getUsers().addAll(user
-                    .getUsers()
-                    .stream()
-                    .map(us -> {
-                        User users = us;
-                        if(users.getUuid().length() > 0){
-                            users = userRepository.findById(users.getUuid()).get();
-                        }
+        Component component = componentRepository.findById(uuid)
+                .orElseThrow(() -> new NotFoundException("Component Not Found")
+        );
+        component.getUsers().addAll(user
+                .getUsers()
+                .stream()
+                .map(us -> {
+                    User users = us;
+                    if(users.getUuid().length() > 0){
+                        users = userRepository.findById(users.getUuid())
+                                .orElseThrow(() -> new NotFoundException("User Not Found"));
                         users.setComponent(component);
                         return users;
-                    }).collect(Collectors.toList()));
-        }
+                    }
+                    else {
+                        throw new DuplicateRecordException("UUID Cannot Be Left Blank");
+                    }
+                }).collect(Collectors.toList()));
         return ComponentMapper.MAPPER.mapToComponentDTO(componentRepository.save(component));
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Throwable.class})
     public ComponentDTO updateComponent(ComponentDTO componentDTO, String uuid, MultipartFile file) {
         String contentType = file.getContentType();
         if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
             throw new DuplicateRecordException("Only JPG and PNG images are supported");
         }
         Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
-        Component existing = componentRepository.findById(uuid).orElse(null);
-        if (existing != null){
-            component.setUuid(existing.getUuid());
-            if(!component.getIcon().equals(existing.getIcon()) && component.getIcon() != null)
-            {
-                filesStorageService.delete(existing.getIcon(),"/component/");
-                String originalFilename = file.getOriginalFilename();
-                String newFilename = component.getName() + filesStorageService.getFileExtension(originalFilename);
-                filesStorageService.saveAs(file, "/component/" + newFilename);
-                component.setIcon(newFilename);
-            }
-            return ComponentMapper.MAPPER.mapToComponentDTO(componentRepository.save(component));
+        Component existing = componentRepository.findById(uuid)
+                .orElseThrow(() -> new NotFoundException("Component Not Found"));
+
+        component.setUuid(existing.getUuid());
+        if(!component.getIcon().equals(existing.getIcon()) && component.getIcon() != null)
+        {
+            filesStorageService.delete(existing.getIcon(),"/component/");
+            String originalFilename = file.getOriginalFilename();
+            String newFilename = component.getName() + filesStorageService.getFileExtension(originalFilename);
+            filesStorageService.saveAs(file, "/component/" + newFilename);
+            component.setIcon(newFilename);
         }
-        return null;
+        return ComponentMapper.MAPPER.mapToComponentDTO(componentRepository.save(component));
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = {Exception.class, Throwable.class})
     public Boolean deleteComponent(String uuid) {
-        Component check = componentRepository.findById(uuid).orElse(null);
-        if (!check.equals(null)){
-            filesStorageService.delete(check.getIcon(),"/component/");
-            componentRepository.deleteById(check.getUuid());
+        Component exists = componentRepository.findById(uuid)
+                .orElseThrow(() -> new NotFoundException("Component Not Found"));
+        if (exists != null)
+        {
+            filesStorageService.delete(exists.getIcon(),"/component/");
+            componentRepository.deleteById(uuid);
             return true;
         }
         return false;
     }
 
     @Override
-    @Transactional
     public ComponentDTO getComponentByUUID(String uuid) {
-        Component component = componentRepository.findById(uuid).orElse(null);
+        Component component = componentRepository.findById(uuid)
+                .orElseThrow(() -> new NotFoundException("Not Found UUID: " + uuid)
+                );
         return ComponentMapper.MAPPER.mapToComponentDTO(component);
     }
 
     @Override
-    @Transactional
     public List<ComponentDTO> getComponentByUserUUID(String uuid) {
-        List<Component> component = componentRepository.findComponentsByUsersUuid(uuid);
-        return ComponentMapper.MAPPER.mapListToComponentDTO(component);
+        List<Component> components = componentRepository.findComponentsByUsersUuid(uuid);
+        if (components.isEmpty()){
+            throw new NotFoundException("Components For User Is Empty");
+        }
+        return ComponentMapper.MAPPER.mapListToComponentDTO(components);
     }
 
     @Override
     public Set<User> getAllUserInComponent(String uuid) {
-        Component component = componentRepository.findById(uuid).orElse(null);
+        Component component = componentRepository.findById(uuid)
+                .orElseThrow(() -> new NotFoundException("Not Found UUID: " + uuid)
+        );
         return component.getUsers();
     }
 

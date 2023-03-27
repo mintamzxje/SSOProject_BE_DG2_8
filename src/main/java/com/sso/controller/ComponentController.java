@@ -43,12 +43,12 @@ public class ComponentController {
             @ApiParam(value = "UUID of the Component", required = true)
             @PathVariable(name = "uuid") String uuid){
 
-        if(!componentService.existsById(uuid))
+        if(!componentService.existsByUUID(uuid))
         {
             throw new NotFoundException("UUID Not Found");
         }
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO(true, HttpStatus.OK, "", componentService.getComponentById(uuid))
+                new ResponseDTO(true, HttpStatus.OK, "", componentService.getComponentByUUID(uuid))
         );
     }
     @PostMapping(value = "/create", consumes = "multipart/form-data")
@@ -75,7 +75,7 @@ public class ComponentController {
             @RequestPart(name = "file") MultipartFile file){
 
         if(componentService.updateComponent(componentRequest, uuid, file) != null){
-            ComponentDTO componentDTO = componentService.getComponentById(uuid);
+            ComponentDTO componentDTO = componentService.getComponentByUUID(uuid);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseDTO(true, HttpStatus.OK, "", componentDTO)
             );
@@ -89,7 +89,7 @@ public class ComponentController {
             @ApiParam(value = "UUID of the Component", required = true)
             @PathVariable(name = "uuid") String uuid){
 
-        if(!componentService.existsById(uuid))
+        if(!componentService.existsByUUID(uuid))
         {
             throw new NotFoundException("UUID Not Found");
         }
@@ -118,7 +118,7 @@ public class ComponentController {
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "",
-                        componentService.getComponentByUserUuid(uuid))
+                        componentService.getComponentByUserUUID(uuid))
         );
     }
     @GetMapping("/get-list-user-in-component/{uuid}")
@@ -127,7 +127,7 @@ public class ComponentController {
             @ApiParam(value = "UUID of the Component", required = true)
             @PathVariable(name = "uuid") String uuid){
 
-        if(!componentService.existsById(uuid))
+        if(!componentService.existsByUUID(uuid))
         {
             throw new NotFoundException("UUID Not Found");
         }

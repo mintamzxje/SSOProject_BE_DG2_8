@@ -14,8 +14,8 @@ public interface ComponentService {
     ComponentDTO addUserToComponent(String uuid, AddUserToComponentRequest user);
     ComponentDTO updateComponent(ComponentDTO componentDTO, String uuid, MultipartFile file);
     Boolean deleteComponent(String uuid);
-    ComponentDTO getComponentById(String uuid);
-    List<ComponentDTO> getComponentByUserUuid(String uuid);
+    ComponentDTO getComponentByUUID(String uuid);
+    List<ComponentDTO> getComponentByUserUUID(String uuid);
     Set<User> getAllUserInComponent(String uuid);
-    Boolean existsById(String uuid);
+    Boolean existsByUUID(String uuid);
 }
