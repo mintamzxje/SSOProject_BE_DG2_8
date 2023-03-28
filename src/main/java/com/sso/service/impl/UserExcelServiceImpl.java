@@ -29,7 +29,8 @@ public class UserExcelServiceImpl implements UserExcelService {
     @Autowired
     private UserRepository userRepository;
 
-    private void createSheetFromComponent(Component component){
+
+    private void createSheetFromComponent(List<User> users){
         workbook = new XSSFWorkbook();
         sheet = workbook.createSheet(sheetName);
         Row row = sheet.createRow(0);
@@ -50,38 +51,34 @@ public class UserExcelServiceImpl implements UserExcelService {
 
         cell = row.createCell(2);
         cell.setCellStyle(style);
-        cell.setCellValue("Password");
+        cell.setCellValue("Full Name");
 
         cell = row.createCell(3);
         cell.setCellStyle(style);
-        cell.setCellValue("Full Name");
+        cell.setCellValue("First Name");
 
         cell = row.createCell(4);
         cell.setCellStyle(style);
-        cell.setCellValue("First Name");
+        cell.setCellValue("Last Name");
 
         cell = row.createCell(5);
         cell.setCellStyle(style);
-        cell.setCellValue("Last Name");
+        cell.setCellValue("Phone");
 
         cell = row.createCell(6);
         cell.setCellStyle(style);
-        cell.setCellValue("Phone");
+        cell.setCellValue("Email");
 
         cell = row.createCell(7);
         cell.setCellStyle(style);
-        cell.setCellValue("Email");
-
-        cell = row.createCell(8);
-        cell.setCellStyle(style);
         cell.setCellValue("Address");
 
-        cell = row.createCell(9);
+        cell = row.createCell(8);
         cell.setCellStyle(style);
         cell.setCellValue("Avatar");
         //
         int i = 1;
-        for (User user:component.getUsers()) {
+        for (User user: users) {
             row = sheet.createRow(i); i++;
 
             cell = row.createCell(0);
@@ -94,33 +91,29 @@ public class UserExcelServiceImpl implements UserExcelService {
 
             cell = row.createCell(2);
             cell.setCellStyle(style);
-            cell.setCellValue(user.getPassWord());
+            cell.setCellValue(user.getFullName());
 
             cell = row.createCell(3);
             cell.setCellStyle(style);
-            cell.setCellValue(user.getFullName());
+            cell.setCellValue(user.getFirstName());
 
             cell = row.createCell(4);
             cell.setCellStyle(style);
-            cell.setCellValue(user.getFirstName());
+            cell.setCellValue(user.getLastName());
 
             cell = row.createCell(5);
             cell.setCellStyle(style);
-            cell.setCellValue(user.getLastName());
+            cell.setCellValue(user.getPhone());
 
             cell = row.createCell(6);
             cell.setCellStyle(style);
-            cell.setCellValue(user.getPhone());
+            cell.setCellValue(user.getEmail());
 
             cell = row.createCell(7);
             cell.setCellStyle(style);
-            cell.setCellValue(user.getEmail());
-
-            cell = row.createCell(8);
-            cell.setCellStyle(style);
             cell.setCellValue(user.getAddress());
 
-            cell = row.createCell(9);
+            cell = row.createCell(8);
             cell.setCellStyle(style);
             cell.setCellValue(user.getAvatar());
         }
@@ -133,14 +126,11 @@ public class UserExcelServiceImpl implements UserExcelService {
         sheet.autoSizeColumn(6);
         sheet.autoSizeColumn(7);
         sheet.autoSizeColumn(8);
-        sheet.autoSizeColumn(9);
 
     }
 
-    public void exportUsersFromComponent(HttpServletResponse response, String componentId) throws IOException {
-        Component component = componentRepository.findById(componentId).orElse(null);
-        if(component == null) return;
-        createSheetFromComponent(component);
+    public void exportUsersFromComponent(HttpServletResponse response) throws IOException {
+        createSheetFromComponent(userRepository.findAll());
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();

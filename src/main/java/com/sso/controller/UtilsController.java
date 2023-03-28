@@ -16,15 +16,15 @@ public class UtilsController {
     @Autowired
     UserExcelService userExcelService;
 
-    @GetMapping("/export/{componentId}")
-    public void exportUsers(HttpServletResponse response, @PathVariable String componentId){
+    @GetMapping("/export")
+    public void exportUsers(HttpServletResponse response){
         response.setContentType("application/octet-stream");
         String headerKey = "Content-Disposition";
         String headerValue = "attachment; filename=book_" + new Date().toString() + ".xlsx";
         response.setHeader(headerKey, headerValue);
 
         try {
-            userExcelService.exportUsersFromComponent(response, componentId);
+            userExcelService.exportUsersFromComponent(response);
         }
         catch (Exception e){
             System.out.println("error when export excel");
