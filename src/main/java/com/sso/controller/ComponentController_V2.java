@@ -150,8 +150,9 @@ public class ComponentController_V2 {
         }
     }
 
-    @PostMapping("/{uuid}/importBook")
-    public ResponseEntity<?> uploadBookFile(
+    @PostMapping("/{uuid}/importUsers")
+    @ApiOperation(value = "Import Users To Component From Excel", response = ResponseEntity.class)
+    public ResponseEntity<?> importUserFromExcel(
             @PathVariable(name = "uuid") String uuid,
             @RequestPart MultipartFile file){
         return ResponseEntity.status(HttpStatus.OK).body(
