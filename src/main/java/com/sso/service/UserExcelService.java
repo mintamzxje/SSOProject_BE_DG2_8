@@ -8,6 +8,6 @@ import java.io.IOException;
 import java.util.List;
 
 public interface UserExcelService {
-    void exportUsersFromComponent(HttpServletResponse response, String componentId) throws IOException;
+    void exportUsersFromComponent(HttpServletResponse response) throws IOException;
     List<User> importUsersFromExcel(MultipartFile file, String componentId) throws IOException;
 }
