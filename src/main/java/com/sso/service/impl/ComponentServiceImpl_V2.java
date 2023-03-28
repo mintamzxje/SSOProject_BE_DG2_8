@@ -2,6 +2,7 @@ package com.sso.service.impl;
 
 import com.sso.exception.DuplicateRecordException;
 import com.sso.exception.NotFoundException;
+import com.sso.factory.excel.ExcelHelper;
 import com.sso.factory.file.FilesStorageService;
 import com.sso.mapper.ComponentMapper;
 import com.sso.model.Component;
@@ -16,8 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -144,5 +145,18 @@ public class ComponentServiceImpl_V2 implements ComponentService {
     @Override
     public Boolean existsByUUID(String uuid) {
         return componentRepository.existsById(uuid);
+    }
+
+    @Transactional(rollbackFor = {Exception.class, Throwable.class})
+    public ComponentDTO importUserFromExcel(MultipartFile file, String uuid) {
+        try {
+            Set<User> users = ExcelHelper.importExcelUserToComponent(file.getInputStream());
+            Component component = componentRepository.findById(uuid)
+                    .orElseThrow(() -> new NotFoundException("Component Not Found"));
+            component.getUsers().addAll(users);
+            return ComponentMapper.MAPPER.mapToComponentDTO(componentRepository.save(component));
+        } catch (IOException e) {
+            throw new RuntimeException("Fail To Store Excel Data: " + e.getMessage());
+        }
     }
 }

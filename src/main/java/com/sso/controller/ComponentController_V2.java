@@ -1,5 +1,9 @@
 package com.sso.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sso.doc.MailMergeNotification;
 import com.sso.exception.NotFoundException;
 import com.sso.payload.dto.ComponentDTO;
@@ -15,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -143,5 +148,14 @@ public class ComponentController_V2 {
             File file = new File(pdfPath);
             Files.delete(file.toPath());
         }
+    }
+
+    @PostMapping("/{uuid}/importBook")
+    public ResponseEntity<?> uploadBookFile(
+            @PathVariable(name = "uuid") String uuid,
+            @RequestPart MultipartFile file){
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseDTO(true, HttpStatus.OK, "",
+                        componentServiceImpl_v2.importUserFromExcel(file, uuid)));
     }
 }
