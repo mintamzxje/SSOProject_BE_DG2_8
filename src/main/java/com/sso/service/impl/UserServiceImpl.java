@@ -35,18 +35,26 @@ public class UserServiceImpl  implements UserService {
     private FilesStorageService filesStorageService;
     @Override
     public UserDTO addUser(UserDTO userDTO, MultipartFile file) {
+        String contentType = file.getContentType();
+        if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
+            throw new DuplicateRecordException("Only JPG and PNG images are supported");
+        }
         User user = UserMapper.MAPPER.mapToUser(userDTO);
         if(file.getOriginalFilename() != null) {
             filesStorageService.delete(file.getOriginalFilename(),"/users/");
         }
         filesStorageService.saveAs(file, "/users/" + file.getOriginalFilename());
         user.setAvatar(file.getOriginalFilename());
-        user.setPassWord(myPasswordEncoder.encode(userDTO.getPassword()));
+        user.setPassWord(passwordEncoder.encode(userDTO.getPassword()));
         return UserMapper.MAPPER.mapToUserDTO(userRepository.save(user));
     }
 
     @Override
     public UserDTO updateUser(String uuid, UserDTO userDTO, MultipartFile file) {
+        String contentType = file.getContentType();
+        if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
+            throw new DuplicateRecordException("Only JPG and PNG images are supported");
+        }
         if(userRepository.existsById(uuid)) {
             User user = UserMapper.MAPPER.mapToUser(userDTO);
             User userDB = userRepository.findById(uuid).orElseThrow(() ->
