@@ -4,7 +4,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.security.NoSuchAlgorithmException;
-
 @Component
 public class MyPasswordEncoder implements PasswordEncoder {
     @Override
