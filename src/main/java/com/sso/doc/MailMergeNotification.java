@@ -24,7 +24,7 @@ public class MailMergeNotification {
     public String MailMergeData(String uuid_user) throws Exception {
         String pdfFileName = "D:/Receipt.pdf";
         UserDTO userDTO = userService.getOneUser(uuid_user);
-        List<ComponentDTO> components = componentService.getComponentByUserUuid(uuid_user);
+        List<ComponentDTO> components = componentService.getComponentByUserUUID(uuid_user);
         String[] fieldNames = new String[]{
                 "uuid_user",
                 "userName",

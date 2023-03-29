@@ -115,14 +115,14 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     @Transactional
-    public ComponentDTO getComponentById(String uuid) {
+    public ComponentDTO getComponentByUUID(String uuid) {
         Component component = componentRepository.findById(uuid).orElse(null);
         return ComponentMapper.MAPPER.mapToComponentDTO(component);
     }
 
     @Override
     @Transactional
-    public List<ComponentDTO> getComponentByUserUuid(String uuid) {
+    public List<ComponentDTO> getComponentByUserUUID(String uuid) {
         List<Component> component = componentRepository.findComponentsByUsersUuid(uuid);
         return ComponentMapper.MAPPER.mapListToComponentDTO(component);
     }
@@ -134,7 +134,7 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
-    public Boolean existsById(String uuid) {
+    public Boolean existsByUUID(String uuid) {
         return componentRepository.existsById(uuid);
     }
 }
