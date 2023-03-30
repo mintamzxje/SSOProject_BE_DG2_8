@@ -1,12 +1,14 @@
 package com.sso.controller;
 
-import com.sso.exception.DuplicateRecordException;
 import com.sso.exception.NotFoundException;
-import com.sso.payload.dto.UserDTO;
-import com.sso.payload.response.ResponseDTO;
-
 import com.sso.model.EmailDetails;
 import com.sso.model.User;
+import com.sso.payload.dto.SignInDTO;
+import com.sso.payload.dto.UserDTO;
+import com.sso.payload.response.JwtResponse;
+import com.sso.payload.response.ResponseDTO;
+import com.sso.security.jwt.JwtProvider;
+import com.sso.security.userprincal.UserPrinciple;
 import com.sso.service.EmailSendService;
 import com.sso.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,28 +16,44 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth/")
-public class UserController {
+@RequestMapping("/v2")
+public class UserControllerV2 {
     @Autowired
     private UserService userService;
     @Autowired
     private EmailSendService emailSendService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtProvider jwtProvider;
     @GetMapping("/")
     public ResponseEntity<?> getAllUser() {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true,HttpStatus.OK,"null",userService.getAll())
         );
     }
-
     @GetMapping("/id")
     public ResponseEntity<?> getOneUserDTO(@RequestParam("id") String uuid) {
         if (!userService.existsByUuid(uuid)) {
@@ -70,9 +88,9 @@ public class UserController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PostMapping("/add")
-    public ResponseEntity<?> add(@Valid @ModelAttribute UserDTO userDTO,
-                                 @RequestPart(name = "file") MultipartFile file) {
+    @PostMapping(value ="/add")
+    public ResponseEntity<?> add(@RequestParam(value = "file") MultipartFile file,
+                                 @RequestParam(value = "request")UserDTO userDTO) {
         if (userService.existsByUserName(userDTO.getUserName())) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ResponseDTO(false,HttpStatus.NOT_FOUND,
@@ -90,11 +108,10 @@ public class UserController {
         );
     }
     @PutMapping("/update")
-    public ResponseEntity<?> update(@RequestParam("id") String uuid, @ModelAttribute UserDTO userDTO,
+    public ResponseEntity<?> update(@RequestParam("id") String uuid, @RequestBody UserDTO userDTO,
                                     @RequestPart("file") MultipartFile file) {
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseDTO(true, HttpStatus.OK,"null",userService.updateUser(uuid,userDTO,
-                        file))
+                new ResponseDTO(true, HttpStatus.OK,"null",userService.updateUser(uuid,userDTO,file))
         );
     }
     @DeleteMapping("/")
@@ -122,9 +139,9 @@ public class UserController {
                             emailSendService.sendSimpleMail(emailDetails))
             );
         } else {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                new ResponseDTO(false,HttpStatus.NOT_FOUND,"find not email: "+email,null)
-        );
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ResponseDTO(false,HttpStatus.NOT_FOUND,"find not email: "+email,null)
+            );
         }
     }
     @PutMapping("/reset-password")
@@ -143,5 +160,16 @@ public class UserController {
                     new ResponseDTO(true,HttpStatus.OK,"null",response)
             );
         }
+    }
+    @PostMapping("/signin")
+    public ResponseEntity<?> login (@Valid @RequestBody SignInDTO signIn) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(signIn.getUserName(),signIn.getPassword())
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = jwtProvider.createToken(authentication);
+        UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
+        return ResponseEntity.ok(new ResponseDTO(true,HttpStatus.OK,"null",new JwtResponse(token,
+                userPrinciple.getIdUser(),userPrinciple.getFullName())));
     }
 }
