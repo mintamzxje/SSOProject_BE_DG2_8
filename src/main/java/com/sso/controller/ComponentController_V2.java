@@ -1,11 +1,6 @@
 package com.sso.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sso.doc.MailMergeNotification;
-import com.sso.exception.NotFoundException;
 import com.sso.payload.dto.ComponentDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
 import com.sso.payload.response.ResponseDTO;
