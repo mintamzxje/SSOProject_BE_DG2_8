@@ -20,15 +20,15 @@ import java.util.*;
 
 @Service
 public class ExcelHelper {
-    private String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    private String SHEET = "Users";
+    private final String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    private final String SHEET = "Users";
     @Autowired
     private ComponentRepository componentRepository;
 
     @Autowired
     private UserRepository userRepository;
 
-    public boolean hasExcelFormat(MultipartFile file) {
+        public boolean hasExcelFormat(MultipartFile file) {
 
         if (!TYPE.equals(file.getContentType())) {
             return false;
@@ -97,11 +97,11 @@ public class ExcelHelper {
                 }
 
                 User us = userRepository.findById(user.getUuid())
-                        .orElseThrow(() -> new NotFoundException("Not Found User: " + user.getUuid()));
+                        .orElseThrow(() -> new NotFoundException("Not Found User UUID: " + user.getUuid()));
                 user.setPassWord(us.getPassWord());
 
                 Component component = componentRepository.findById(uuid)
-                        .orElseThrow(() -> new NotFoundException("Not Found UUID: " + uuid));
+                        .orElseThrow(() -> new NotFoundException("Not Found Component UUID: " + uuid));
 
                 Set<User> userSet = component.getUsers();
                 if(!user.getUuid().equals("") && user.getUserName() != null){
