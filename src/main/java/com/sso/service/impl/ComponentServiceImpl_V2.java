@@ -118,6 +118,7 @@ public class ComponentServiceImpl_V2 implements ComponentService {
                 .orElseThrow(() -> new NotFoundException("Component Not Found"));
 
         component.setUuid(existing.getUuid());
+
         if(!component.getIcon().equals(existing.getIcon()) && component.getIcon() != null)
         {
             filesStorageService.delete(existing.getIcon(),"/component/");
