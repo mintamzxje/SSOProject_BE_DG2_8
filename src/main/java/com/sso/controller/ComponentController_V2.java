@@ -100,7 +100,7 @@ public class ComponentController_V2 {
             @ApiParam(value = "UUID of the Component", required = true)
             @PathVariable(name = "uuid") String uuid,
             @ApiParam(value = "Icon of the Component")
-            @RequestPart(name = "file") MultipartFile file,
+            @RequestPart(name = "file", required = false) MultipartFile file,
             @ApiParam(value = "The component object that needs to be created ", required = true)
             @ModelAttribute ComponentDTO componentRequest){
         return ResponseEntity.status(HttpStatus.OK).body(
