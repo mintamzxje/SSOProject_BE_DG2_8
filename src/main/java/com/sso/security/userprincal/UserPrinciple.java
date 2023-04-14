@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sso.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
+import java.util.Map;
 
-public class UserPrinciple implements UserDetails {
+public class UserPrinciple implements OAuth2User, UserDetails {
     private String idUser;
     private String fullName;
     private String lastName;
@@ -17,6 +19,7 @@ public class UserPrinciple implements UserDetails {
     private String password;
     private String email;
     private String phone;
+    private Map<String, Object> attributes;
 
     public UserPrinciple() {
     }
@@ -44,6 +47,11 @@ public class UserPrinciple implements UserDetails {
                 user.getPhone()
         );
     }
+    public static UserPrinciple create(User user, Map<String, Object> attributes) {
+        UserPrinciple userPrincipal = UserPrinciple.build(user);
+        userPrincipal.setAttributes(attributes);
+        return userPrincipal;
+    }
     public String getFullName() {
         return fullName;
     }
@@ -58,6 +66,11 @@ public class UserPrinciple implements UserDetails {
 
     public void setIdUser(String idUser) {
         this.idUser = idUser;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
     }
 
     @Override
@@ -93,5 +106,13 @@ public class UserPrinciple implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
+    }
+    @Override
+    public String getName() {
+        return String.valueOf(idUser);
     }
 }

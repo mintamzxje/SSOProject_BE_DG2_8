@@ -4,11 +4,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.security.NoSuchAlgorithmException;
+
 @Component
 public class MyPasswordEncoder implements PasswordEncoder {
     @Override
     public String encode(CharSequence rawPassword) {
-        String salt = PasswordUtil.generateSalt();
+//        String salt = PasswordUtil.generateSalt();
+        String salt = "intern";
         String hashedPassword;
         try {
             hashedPassword = PasswordUtil.hashPassword(rawPassword.toString(), salt);
@@ -20,7 +22,8 @@ public class MyPasswordEncoder implements PasswordEncoder {
 
     @Override
     public boolean matches(CharSequence rawPassword, String encodedPassword) {
-        String salt = encodedPassword.substring(0, 24); // Assumes salt is 24 characters long
+//        String salt = encodedPassword.substring(0, 24); // Assumes salt is 24 characters long
+        String salt = "intern";
         String hashedPassword;
         try {
             hashedPassword = PasswordUtil.hashPassword(rawPassword.toString(), salt);

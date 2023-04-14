@@ -25,9 +25,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -89,8 +91,8 @@ public class UserControllerV2 {
         }
     }
     @PostMapping(value ="/add")
-    public ResponseEntity<?> add(@RequestParam(value = "file") MultipartFile file,
-                                 @RequestParam(value = "request")UserDTO userDTO) {
+    public ResponseEntity<?> add(@RequestPart(value = "file") MultipartFile file,
+                                 UserDTO userDTO) {
         if (userService.existsByUserName(userDTO.getUserName())) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ResponseDTO(false,HttpStatus.NOT_FOUND,
@@ -160,6 +162,16 @@ public class UserControllerV2 {
                     new ResponseDTO(true,HttpStatus.OK,"null",response)
             );
         }
+    }
+    @PostMapping("signup")
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserDTO userDTO) {
+        UserDTO result = userService.singUp(userDTO);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/user/me")
+                .buildAndExpand(result.getUuid()).toUri();
+        return ResponseEntity.created(location).body(
+                new ResponseDTO(true,HttpStatus.OK,"User registered successfully",userDTO)
+        );
     }
     @PostMapping("/signin")
     public ResponseEntity<?> login (@Valid @RequestBody SignInDTO signIn) {

@@ -2,6 +2,7 @@ package com.sso.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -27,7 +28,6 @@ public class User {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String uuid;
     @Column(name = "username")
-
     private String userName;
     @NotBlank
     @JsonIgnore
@@ -55,14 +55,15 @@ public class User {
     @Column(name = "token_creation_date")
     private LocalDateTime tokenCreationDate;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    private AuthProvider authProvider;
     @ManyToMany(mappedBy = "users")
     @JsonIgnore
     private Set<Component> components = new HashSet<>();
-
     public User(){
 
     }
-
     public User(String uuid, String userName, String passWord, String fullName, String firstName, String lastName,
                 String phone, String email, String address, String avatar, String token,
                 LocalDateTime tokenCreationDate) {
@@ -100,6 +101,13 @@ public class User {
         this.avatar = avatar;
     }
 
+    public AuthProvider getAuthProvider() {
+        return authProvider;
+    }
+
+    public void setAuthProvider(AuthProvider authProvider) {
+        this.authProvider = authProvider;
+    }
 
     public String getToken() {
         return token;

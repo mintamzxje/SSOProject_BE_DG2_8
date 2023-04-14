@@ -1,5 +1,6 @@
 package com.sso.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.validation.constraints.Email;
@@ -16,16 +17,20 @@ import java.time.ZoneId;
 public class EmailDetails {
     @Email
     @NotEmpty
+    @Schema(example = "pdphuoc-batch12bd@sdc.edu.vn")
     private String recipient;
     @NotEmpty
+    @Schema(example = "Email Scheduler")
     private String msgBody;
     @NotEmpty
+    @Schema(example = "Email Scheduler")
     private String subject;
     private String attachment;
     private String[] cc;
     @NotNull
     private LocalDateTime dateTime;
     @NotNull
+    @Schema(example = "Asia/Bangkok")
     private ZoneId timeZone;
 
 }

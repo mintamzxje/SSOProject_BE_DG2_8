@@ -17,6 +17,7 @@ public interface UserService {
     boolean delete(String uuid);
     String forgotPassword(String email);
     String resetPassword(String token, String password);
+    UserDTO singUp(UserDTO userDTO);
 
     boolean existsByUuid(String uuid);
     boolean existsByUserName(String userName);
