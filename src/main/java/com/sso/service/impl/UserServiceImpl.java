@@ -5,6 +5,7 @@ import com.sso.exception.NotFoundException;
 import com.sso.factory.encodepassword.MyPasswordEncoder;
 import com.sso.factory.file.FilesStorageService;
 import com.sso.mapper.UserMapper;
+import com.sso.model.AuthProvider;
 import com.sso.payload.dto.UserDTO;
 import com.sso.model.User;
 import com.sso.repository.UserRepository;
@@ -69,7 +70,7 @@ public class UserServiceImpl  implements UserService {
             filesStorageService.saveAs(file, "/users/"+file.getOriginalFilename());
             user.setUuid(userDB.getUuid());
             user.setAvatar(file.getOriginalFilename());
-            user.setPassWord(myPasswordEncoder.encode(userDTO.getPassword()));
+            user.setPassWord(passwordEncoder.encode(userDTO.getPassword()));
             return UserMapper.MAPPER.mapToUserDTO(userRepository.saveAndFlush(user));
         }
         throw new NotFoundException("Find not id: "+uuid);
@@ -107,7 +108,7 @@ public class UserServiceImpl  implements UserService {
     }
     @Override
     public String forgotPassword(String email) {
-        Optional<User> userOptional = Optional.ofNullable(userRepository.findByEmail(email));
+        Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isEmpty()) {
             return "Invalid email id.";
         }
@@ -134,6 +135,20 @@ public class UserServiceImpl  implements UserService {
         user.setTokenCreationDate(null);
         userRepository.save(user);
         return "Your password successfully updated.";
+    }
+
+    @Override
+    public UserDTO singUp(UserDTO userDTO) {
+        if(userRepository.existsByEmail(userDTO.getEmail())) {
+            throw new DuplicateRecordException("Email address already in use.");
+        }
+        if(userRepository.existsByUserName(userDTO.getUserName())) {
+            throw new DuplicateRecordException("Username already in use.");
+        }
+        User user = UserMapper.MAPPER.mapToUser(userDTO);
+        user.setPassWord(myPasswordEncoder.encode(userDTO.getPassword()));
+        user.setAuthProvider(AuthProvider.LOCAL);
+        return UserMapper.MAPPER.mapToUserDTO(userRepository.save(user));
     }
 
     private String generateToken() {

@@ -35,15 +35,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    @Autowired
-    PasswordEncoder myPasswordEncoder() {
+    MyPasswordEncoder myPasswordEncoder() {
         return new MyPasswordEncoder();
     }
 
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(userDetailService).passwordEncoder(myPasswordEncoder());
     }
 
     @Bean
@@ -56,10 +55,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeRequests()
-
                 .antMatchers("/v2/**")
-
-
                 .permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling()
