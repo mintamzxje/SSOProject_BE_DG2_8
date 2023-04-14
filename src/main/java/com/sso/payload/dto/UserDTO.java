@@ -14,7 +14,7 @@ public class UserDTO {
     private String uuid;
     @Schema(example = "admin")
     private String userName;
-
+    private String email;
     private String password;
     @Schema(example = "admin")
     private String fullName;
