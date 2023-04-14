@@ -1,6 +1,3 @@
-create database SSO;
-use SSO;
-
 create table user(
 	uuid char(36) not null,
     username varchar(20) not null,
@@ -12,6 +9,8 @@ create table user(
     email varchar(50) not null,
     address varchar(255) not null,
     avatar varchar(255) not null,
+    token varchar(255) ,
+    token_creation_date timestamp,
     primary key(uuid),
     unique(email,username)
 ) ENGINE = InnoDB
