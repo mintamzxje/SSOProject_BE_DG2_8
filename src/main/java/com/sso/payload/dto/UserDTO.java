@@ -1,5 +1,6 @@
 package com.sso.payload.dto;
 
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -9,12 +10,11 @@ import lombok.*;
 @Getter
 @Setter
 public class UserDTO {
+    @Schema(title = "uuid",required = true)
     private String uuid;
     @Schema(example = "admin")
     private String userName;
-    @Schema(example = "admin@gmail.com")
-    private String email;
-    @Schema(example = "123")
+
     private String password;
     @Schema(example = "admin")
     private String fullName;
@@ -26,5 +26,4 @@ public class UserDTO {
     private String phone;
     private String address;
     private String avatar;
-
 }

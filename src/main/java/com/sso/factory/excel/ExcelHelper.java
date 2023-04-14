@@ -1,22 +1,34 @@
 package com.sso.factory.excel;
 
+import com.sso.exception.NotFoundException;
+import com.sso.model.Component;
 import com.sso.model.User;
+import com.sso.repository.ComponentRepository;
+import com.sso.repository.UserRepository;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+@Service
 public class ExcelHelper {
-    public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    static String SHEET = "Users";
+    private final String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    private final String SHEET = "Users";
+    @Autowired
+    private ComponentRepository componentRepository;
 
-    public static boolean hasExcelFormat(MultipartFile file) {
+    @Autowired
+    private UserRepository userRepository;
+
+        public boolean hasExcelFormat(MultipartFile file) {
 
         if (!TYPE.equals(file.getContentType())) {
             return false;
@@ -24,7 +36,7 @@ public class ExcelHelper {
         return true;
     }
 
-    public static Set<User> importExcelUserToComponent(InputStream is) {
+    public Set<User> importExcelUserToComponent(InputStream is, String uuid) {
         try {
             Workbook workbook = new XSSFWorkbook(is);
 
@@ -56,7 +68,6 @@ public class ExcelHelper {
                             break;
                         case 1:
                             user.setUserName(currentCell.getStringCellValue());
-                            user.setPassWord("");
                             break;
                         case 2:
                             user.setFullName(currentCell.getStringCellValue());
@@ -84,8 +95,24 @@ public class ExcelHelper {
                     }
                     cellIdx++;
                 }
+
+                User us = userRepository.findById(user.getUuid())
+                        .orElseThrow(() -> new NotFoundException("Not Found User UUID: " + user.getUuid()));
+                user.setPassWord(us.getPassWord());
+
+                Component component = componentRepository.findById(uuid)
+                        .orElseThrow(() -> new NotFoundException("Not Found Component UUID: " + uuid));
+
+                Set<User> userSet = component.getUsers();
                 if(!user.getUuid().equals("") && user.getUserName() != null){
                     excelUsers.add(user);
+                    for (User setUser : userSet){
+                        for (User excelUser : excelUsers){
+                            if(setUser.getUuid().equals(excelUser.getUuid())){
+                                excelUsers.remove(user);
+                            }
+                        }
+                    }
                 }
             }
             workbook.close();

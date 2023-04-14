@@ -1,11 +1,6 @@
 package com.sso.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sso.doc.MailMergeNotification;
-import com.sso.exception.NotFoundException;
 import com.sso.payload.dto.ComponentDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
 import com.sso.payload.response.ResponseDTO;
@@ -19,7 +14,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -79,7 +73,7 @@ public class ComponentController_V2 {
     @ApiOperation(value = "Create New Component", response = ResponseEntity.class)
     public ResponseEntity<?> createComponent(
             @ApiParam(value = "Icon of the Component", required = true)
-            @RequestPart(name = "file")MultipartFile file,
+            @RequestPart(name = "file") MultipartFile file,
             @ApiParam(value = "The component object that needs to be created ", required = true)
             @ModelAttribute ComponentDTO componentDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -153,7 +147,9 @@ public class ComponentController_V2 {
     @PostMapping("/{uuid}/importUsers")
     @ApiOperation(value = "Import Users To Component From Excel", response = ResponseEntity.class)
     public ResponseEntity<?> importUserFromExcel(
+            @ApiParam(value = "UUID of the Component", required = true)
             @PathVariable(name = "uuid") String uuid,
+            @ApiParam(value = "File Excel", required = true)
             @RequestPart MultipartFile file){
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "",

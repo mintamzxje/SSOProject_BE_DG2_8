@@ -32,6 +32,9 @@ public class ComponentServiceImpl_V2 implements ComponentService {
     @Autowired
     private FilesStorageService filesStorageService;
 
+    @Autowired
+    private ExcelHelper excelHelper;
+
     @Override
     public List<ComponentDTO> getAllComponent() {
         List<Component> components = componentRepository.findAll();
@@ -39,6 +42,29 @@ public class ComponentServiceImpl_V2 implements ComponentService {
             throw new NotFoundException("Component Is Empty");
         }
         return ComponentMapper.MAPPER.mapListToComponentDTO(components);
+    }
+
+    @Override
+    public ComponentDTO getComponentByUUID(String uuid) {
+        Component component = componentRepository.findById(uuid)
+                .orElseThrow(() -> new NotFoundException("Not Found UUID: " + uuid));
+        return ComponentMapper.MAPPER.mapToComponentDTO(component);
+    }
+
+    @Override
+    public List<ComponentDTO> getComponentByUserUUID(String uuid) {
+        List<Component> components = componentRepository.findComponentsByUsersUuid(uuid);
+        if (components.isEmpty()){
+            throw new NotFoundException("Components For User Is Empty");
+        }
+        return ComponentMapper.MAPPER.mapListToComponentDTO(components);
+    }
+
+    @Override
+    public Set<User> getAllUserInComponent(String uuid) {
+        Component component = componentRepository.findById(uuid)
+                .orElseThrow(() -> new NotFoundException("Not Found UUID: " + uuid));
+        return component.getUsers();
     }
 
     @Override
@@ -92,6 +118,7 @@ public class ComponentServiceImpl_V2 implements ComponentService {
                 .orElseThrow(() -> new NotFoundException("Component Not Found"));
 
         component.setUuid(existing.getUuid());
+
         if(!component.getIcon().equals(existing.getIcon()) && component.getIcon() != null)
         {
             filesStorageService.delete(existing.getIcon(),"/component/");
@@ -118,31 +145,6 @@ public class ComponentServiceImpl_V2 implements ComponentService {
     }
 
     @Override
-    public ComponentDTO getComponentByUUID(String uuid) {
-        Component component = componentRepository.findById(uuid)
-                .orElseThrow(() -> new NotFoundException("Not Found UUID: " + uuid)
-                );
-        return ComponentMapper.MAPPER.mapToComponentDTO(component);
-    }
-
-    @Override
-    public List<ComponentDTO> getComponentByUserUUID(String uuid) {
-        List<Component> components = componentRepository.findComponentsByUsersUuid(uuid);
-        if (components.isEmpty()){
-            throw new NotFoundException("Components For User Is Empty");
-        }
-        return ComponentMapper.MAPPER.mapListToComponentDTO(components);
-    }
-
-    @Override
-    public Set<User> getAllUserInComponent(String uuid) {
-        Component component = componentRepository.findById(uuid)
-                .orElseThrow(() -> new NotFoundException("Not Found UUID: " + uuid)
-        );
-        return component.getUsers();
-    }
-
-    @Override
     public Boolean existsByUUID(String uuid) {
         return componentRepository.existsById(uuid);
     }
@@ -150,7 +152,11 @@ public class ComponentServiceImpl_V2 implements ComponentService {
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
     public ComponentDTO importUserFromExcel(MultipartFile file, String uuid) {
         try {
-            Set<User> users = ExcelHelper.importExcelUserToComponent(file.getInputStream());
+            Set<User> users = excelHelper.importExcelUserToComponent(file.getInputStream(), uuid);
+            if (users.isEmpty()){
+                throw new DuplicateRecordException("The list of users in the excel file is already " +
+                        "in the Component or the excel file is empty");
+            }
             Component component = componentRepository.findById(uuid)
                     .orElseThrow(() -> new NotFoundException("Component Not Found"));
             component.getUsers().addAll(users);
