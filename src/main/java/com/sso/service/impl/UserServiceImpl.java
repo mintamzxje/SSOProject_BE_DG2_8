@@ -146,7 +146,7 @@ public class UserServiceImpl  implements UserService {
             throw new DuplicateRecordException("Username already in use.");
         }
         User user = UserMapper.MAPPER.mapToUser(userDTO);
-        user.setPassWord(myPasswordEncoder.encode(userDTO.getPassword()));
+        user.setPassWord(passwordEncoder.encode(userDTO.getPassword()));
         user.setAuthProvider(AuthProvider.LOCAL);
         return UserMapper.MAPPER.mapToUserDTO(userRepository.save(user));
     }
