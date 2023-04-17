@@ -100,7 +100,7 @@ public class ComponentController_V2 {
             @ApiParam(value = "UUID of the Component", required = true)
             @PathVariable(name = "uuid") String uuid,
             @ApiParam(value = "Icon of the Component")
-            @RequestPart(name = "file") MultipartFile file,
+            @RequestPart(name = "file", required = false) MultipartFile file,
             @ApiParam(value = "The component object that needs to be created ", required = true)
             @ModelAttribute ComponentDTO componentRequest){
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -154,5 +154,29 @@ public class ComponentController_V2 {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "",
                         componentServiceImpl_v2.importUserFromExcel(file, uuid)));
+    }
+    @PostMapping("/mailMergeNotificationImportFile/{uuid}")
+    @ApiOperation(value = "Mail Merge Notification List Component For User", response = ResponseEntity.class)
+    public ResponseEntity<Resource> mailMergeNotificationImportFile(
+            @ApiParam(value = "UUID of the User", required = true)
+            @PathVariable(name = "uuid") String uuid,
+            @RequestPart MultipartFile files) throws Exception {
+
+        String pdfPath = "";
+        try {
+            pdfPath = mailMergeNotification.MailMergeDataImportFile(uuid, files);
+            File file = new File(pdfPath);
+            ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(file.toPath()));
+
+            HttpHeaders headers = new HttpHeaders();
+            String headerKey = "Content-Disposition";
+            String headerValue = "attachment; filename=list-component.pdf";
+            headers.set(headerKey, headerValue);
+            return ResponseEntity.ok().headers(headers).contentLength(file.length())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+        } finally {
+            File file = new File(pdfPath);
+            Files.delete(file.toPath());
+        }
     }
 }

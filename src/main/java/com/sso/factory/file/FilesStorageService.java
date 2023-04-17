@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 
 @Service
 public class FilesStorageService {
-    private String RootPath = "static/uploads";
+    private String RootPath = "uploads";
     private Path convertRelativeToAbsolutePath(String relativePath) throws Exception{
         return Paths.get(RootPath + relativePath);
     }
