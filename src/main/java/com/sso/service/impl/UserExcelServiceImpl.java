@@ -40,40 +40,37 @@ public class UserExcelServiceImpl implements UserExcelService {
         font.setBold(true);
         font.setFontHeight(16);
         style.setFont(font);
-        // cells
-        Cell cell = row.createCell(0);
-        cell.setCellStyle(style);
-        cell.setCellValue("Id");
+        // cell
 
-        cell = row.createCell(1);
+        Cell cell = row.createCell(0);
         cell.setCellStyle(style);
         cell.setCellValue("Username");
 
-        cell = row.createCell(2);
+        cell = row.createCell(1);
         cell.setCellStyle(style);
         cell.setCellValue("Full Name");
 
-        cell = row.createCell(3);
+        cell = row.createCell(2);
         cell.setCellStyle(style);
         cell.setCellValue("First Name");
 
-        cell = row.createCell(4);
+        cell = row.createCell(3);
         cell.setCellStyle(style);
         cell.setCellValue("Last Name");
 
-        cell = row.createCell(5);
+        cell = row.createCell(4);
         cell.setCellStyle(style);
         cell.setCellValue("Phone");
 
-        cell = row.createCell(6);
+        cell = row.createCell(5);
         cell.setCellStyle(style);
         cell.setCellValue("Email");
 
-        cell = row.createCell(7);
+        cell = row.createCell(6);
         cell.setCellStyle(style);
         cell.setCellValue("Address");
 
-        cell = row.createCell(8);
+        cell = row.createCell(7);
         cell.setCellStyle(style);
         cell.setCellValue("Avatar");
         //
@@ -83,37 +80,33 @@ public class UserExcelServiceImpl implements UserExcelService {
 
             cell = row.createCell(0);
             cell.setCellStyle(style);
-            cell.setCellValue(user.getUuid());
+            cell.setCellValue(user.getUserName());
 
             cell = row.createCell(1);
             cell.setCellStyle(style);
-            cell.setCellValue(user.getUserName());
+            cell.setCellValue(user.getFullName());
 
             cell = row.createCell(2);
             cell.setCellStyle(style);
-            cell.setCellValue(user.getFullName());
+            cell.setCellValue(user.getFirstName());
 
             cell = row.createCell(3);
             cell.setCellStyle(style);
-            cell.setCellValue(user.getFirstName());
+            cell.setCellValue(user.getLastName());
 
             cell = row.createCell(4);
             cell.setCellStyle(style);
-            cell.setCellValue(user.getLastName());
+            cell.setCellValue(user.getPhone());
 
             cell = row.createCell(5);
             cell.setCellStyle(style);
-            cell.setCellValue(user.getPhone());
+            cell.setCellValue(user.getEmail());
 
             cell = row.createCell(6);
             cell.setCellStyle(style);
-            cell.setCellValue(user.getEmail());
-
-            cell = row.createCell(7);
-            cell.setCellStyle(style);
             cell.setCellValue(user.getAddress());
 
-            cell = row.createCell(8);
+            cell = row.createCell(7);
             cell.setCellStyle(style);
             cell.setCellValue(user.getAvatar());
         }
@@ -125,7 +118,6 @@ public class UserExcelServiceImpl implements UserExcelService {
         sheet.autoSizeColumn(5);
         sheet.autoSizeColumn(6);
         sheet.autoSizeColumn(7);
-        sheet.autoSizeColumn(8);
 
     }
 
@@ -163,11 +155,10 @@ public class UserExcelServiceImpl implements UserExcelService {
             Iterator<Cell> cellsInRow = currentRow.iterator();
             User user = new User();
 
-            int cellIdx = 0;
+            int cellIdx = 1;
             while (cellsInRow.hasNext()) {
                 Cell currentCell = cellsInRow.next();
                 switch (cellIdx) {
-
                     case 1:
                         user.setUserName(currentCell.getStringCellValue());
                         break;
