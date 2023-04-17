@@ -155,4 +155,28 @@ public class ComponentController_V2 {
                 new ResponseDTO(true, HttpStatus.OK, "",
                         componentServiceImpl_v2.importUserFromExcel(file, uuid)));
     }
+    @PostMapping("/mailMergeNotificationImportFile/{uuid}")
+    @ApiOperation(value = "Mail Merge Notification List Component For User", response = ResponseEntity.class)
+    public ResponseEntity<Resource> mailMergeNotificationImportFile(
+            @ApiParam(value = "UUID of the User", required = true)
+            @PathVariable(name = "uuid") String uuid,
+            @RequestPart MultipartFile files) throws Exception {
+
+        String pdfPath = "";
+        try {
+            pdfPath = mailMergeNotification.MailMergeDataImportFile(uuid, files);
+            File file = new File(pdfPath);
+            ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(file.toPath()));
+
+            HttpHeaders headers = new HttpHeaders();
+            String headerKey = "Content-Disposition";
+            String headerValue = "attachment; filename=list-component.pdf";
+            headers.set(headerKey, headerValue);
+            return ResponseEntity.ok().headers(headers).contentLength(file.length())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+        } finally {
+            File file = new File(pdfPath);
+            Files.delete(file.toPath());
+        }
+    }
 }
