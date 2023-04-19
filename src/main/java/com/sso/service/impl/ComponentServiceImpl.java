@@ -8,6 +8,7 @@ import com.sso.payload.dto.ComponentDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
 import com.sso.mapper.ComponentMapper;
 import com.sso.model.Component;
+import com.sso.payload.request.ComponentDTORequest;
 import com.sso.repository.ComponentRepository;
 import com.sso.repository.UserRepository;
 import com.sso.service.ComponentService;
@@ -44,12 +45,12 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     @Transactional
-    public ComponentDTO createComponent(ComponentDTO componentDTO, MultipartFile file) {
+    public ComponentDTO createComponent(ComponentDTORequest componentDTORequest, MultipartFile file) {
         String contentType = file.getContentType();
         if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
             throw new DuplicateRecordException("Only JPG and PNG images are supported");
         }
-        Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
+        Component component = ComponentMapper.MAPPER.mapToComponent(componentDTORequest);
         String originalFilename = file.getOriginalFilename();
         String newFilename = component.getName() + filesStorageService.getFileExtension(originalFilename);
         filesStorageService.saveAs(file, "/component/" + newFilename);
@@ -79,7 +80,7 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     @Transactional
-    public ComponentDTO updateComponent(ComponentDTO componentDTO, String uuid, MultipartFile file) {
+    public ComponentDTO updateComponent(ComponentDTORequest componentDTO, String uuid, MultipartFile file) {
         String contentType = file.getContentType();
         if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
             throw new DuplicateRecordException("Only JPG and PNG images are supported");
