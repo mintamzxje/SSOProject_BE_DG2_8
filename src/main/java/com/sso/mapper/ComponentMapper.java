@@ -2,6 +2,7 @@ package com.sso.mapper;
 
 import com.sso.payload.dto.ComponentDTO;
 import com.sso.model.Component;
+import com.sso.payload.request.ComponentDTORequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -14,4 +15,5 @@ public interface ComponentMapper {
     ComponentDTO mapToComponentDTO(Component component);
     List<ComponentDTO> mapListToComponentDTO(List<Component> component);
     List<Component> mapListToComponent(List<ComponentDTO> componentDTO);
+    Component mapToComponent(ComponentDTORequest componentDTORequest);
 }

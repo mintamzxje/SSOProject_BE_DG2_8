@@ -3,6 +3,7 @@ package com.sso.controller;
 import com.sso.doc.MailMergeNotification;
 import com.sso.payload.dto.ComponentDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
+import com.sso.payload.request.ComponentDTORequest;
 import com.sso.payload.response.ResponseDTO;
 import com.sso.service.impl.ComponentServiceImpl_V2;
 import io.swagger.annotations.ApiOperation;
@@ -75,7 +76,7 @@ public class ComponentController_V2 {
             @ApiParam(value = "Icon of the Component", required = true)
             @RequestPart(name = "file") MultipartFile file,
             @ApiParam(value = "The component object that needs to be created ", required = true)
-            @ModelAttribute ComponentDTO componentDTO){
+            @ModelAttribute ComponentDTORequest componentDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ResponseDTO(true, HttpStatus.CREATED, "",
                         componentServiceImpl_v2.createComponent(componentDTO, file))
@@ -102,7 +103,7 @@ public class ComponentController_V2 {
             @ApiParam(value = "Icon of the Component")
             @RequestPart(name = "file", required = false) MultipartFile file,
             @ApiParam(value = "The component object that needs to be created ", required = true)
-            @ModelAttribute ComponentDTO componentRequest){
+            @ModelAttribute ComponentDTORequest componentRequest){
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK, "",
                         componentServiceImpl_v2.updateComponent(componentRequest, uuid, file))

@@ -3,6 +3,7 @@ package com.sso.controller;
 import com.sso.doc.MailMergeNotification;
 import com.sso.exception.NotFoundException;
 import com.sso.payload.dto.ComponentDTO;
+import com.sso.payload.request.ComponentDTORequest;
 import com.sso.payload.response.ResponseDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
 import com.sso.service.impl.ComponentServiceImpl;
@@ -55,7 +56,7 @@ public class ComponentController {
     @ApiOperation(value = "Create New Component", response = ResponseEntity.class)
     public ResponseEntity<?> createNewComponent(
             @ApiParam(value = "The component object that needs to be created ", required = true)
-            @ModelAttribute ComponentDTO componentRequest,
+            @ModelAttribute ComponentDTORequest componentRequest,
             @ApiParam(value = "Icon of the Component", required = true)
             @RequestPart(name = "file") MultipartFile file){
 
@@ -70,7 +71,7 @@ public class ComponentController {
             @ApiParam(value = "UUID of the Component", required = true)
             @PathVariable(name = "uuid") String uuid,
             @ApiParam(value = "The component object that needs to be created ", required = true)
-            @ModelAttribute ComponentDTO componentRequest,
+            @ModelAttribute ComponentDTORequest componentRequest,
             @ApiParam(value = "Icon of the Component", required = true)
             @RequestPart(name = "file") MultipartFile file){
 
