@@ -2,6 +2,7 @@ package com.sso.controller;
 
 import com.sso.factory.email.ScheduleEmailResponse;
 import com.sso.model.EmailDetails;
+import com.sso.service.EmailDetailService;
 import com.sso.service.EmailSendService;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -29,6 +30,8 @@ public class EmailSchedulerController {
     private Scheduler scheduler;
     @Autowired
     private EmailSendService emailSendService;
+    @Autowired
+    private EmailDetailService emailDetailService;
 
     @PostMapping("/schedule")
     public ResponseEntity<?> scheduleEmail(@Valid @RequestBody EmailDetails emailDetails) {
@@ -44,7 +47,8 @@ public class EmailSchedulerController {
             Trigger trigger = emailSendService.buildJobTrigger(jobDetail, dateTime);
             scheduler.scheduleJob(jobDetail, trigger);
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ScheduleEmailResponse(true,HttpStatus.OK,"null",emailDetails)
+                    new ScheduleEmailResponse(true,HttpStatus.OK,"null",
+                            emailDetailService.addEmail(emailDetails))
             );
         } catch (SchedulerException ex) {
             logger.error("Error scheduling email", ex);
