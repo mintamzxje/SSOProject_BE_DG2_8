@@ -10,6 +10,7 @@ import com.sso.service.impl.ComponentServiceImpl;
 import com.sso.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -39,6 +40,30 @@ public class MailMergeNotification {
         };
         Document document = new Document();
         document.loadFromStream(MailMergeNotification.class.getResourceAsStream("/templates/docs/list-component.docx"), FileFormat.Auto);
+        MailMergeDataTable dataTable = new MailMergeDataTable("Components", components);
+        document.getMailMerge().execute(fieldNames,fieldValues);
+        document.getMailMerge().executeGroup(dataTable);
+        document.saveToFile(pdfFileName, FileFormat.PDF);
+        return pdfFileName;
+    }
+    public String MailMergeDataImportFile(String uuid_user, MultipartFile file) throws Exception {
+        String pdfFileName = "D:/Receipt.pdf";
+        UserDTO userDTO = userService.getOneUser(uuid_user);
+        List<ComponentDTO> components = componentService.getComponentByUserUUID(uuid_user);
+        String[] fieldNames = new String[]{
+                "uuid_user",
+                "userName",
+                "fullName",
+                "email"
+        };
+        String[] fieldValues = new String[]{
+                userDTO.getUuid(),
+                userDTO.getUserName(),
+                userDTO.getFullName(),
+                userDTO.getEmail()
+        };
+        Document document = new Document();
+        document.loadFromStream(file.getInputStream(), FileFormat.Auto);
         MailMergeDataTable dataTable = new MailMergeDataTable("Components", components);
         document.getMailMerge().execute(fieldNames,fieldValues);
         document.getMailMerge().executeGroup(dataTable);

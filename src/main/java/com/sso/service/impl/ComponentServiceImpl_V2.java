@@ -9,6 +9,7 @@ import com.sso.model.Component;
 import com.sso.model.User;
 import com.sso.payload.dto.ComponentDTO;
 import com.sso.payload.request.AddUserToComponentRequest;
+import com.sso.payload.request.ComponentDTORequest;
 import com.sso.repository.ComponentRepository;
 import com.sso.repository.UserRepository;
 import com.sso.service.ComponentService;
@@ -69,12 +70,12 @@ public class ComponentServiceImpl_V2 implements ComponentService {
 
     @Override
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
-    public ComponentDTO createComponent(ComponentDTO componentDTO, MultipartFile file) {
+    public ComponentDTO createComponent(ComponentDTORequest componentDTORequest, MultipartFile file) {
         String contentType = file.getContentType();
         if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
             throw new DuplicateRecordException("Only JPG and PNG images are supported");
         }
-        Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
+        Component component = ComponentMapper.MAPPER.mapToComponent(componentDTORequest);
         String originalFilename = file.getOriginalFilename();
         String newFilename = component.getName() + filesStorageService.getFileExtension(originalFilename);
         filesStorageService.saveAs(file, "/component/" + newFilename);
@@ -108,16 +109,17 @@ public class ComponentServiceImpl_V2 implements ComponentService {
 
     @Override
     @Transactional(rollbackFor = {Exception.class, Throwable.class})
-    public ComponentDTO updateComponent(ComponentDTO componentDTO, String uuid, MultipartFile file) {
+    public ComponentDTO updateComponent(ComponentDTORequest componentDTORequest, String uuid, MultipartFile file) {
         String contentType = file.getContentType();
         if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
             throw new DuplicateRecordException("Only JPG and PNG images are supported");
         }
-        Component component = ComponentMapper.MAPPER.mapToComponent(componentDTO);
+        Component component = ComponentMapper.MAPPER.mapToComponent(componentDTORequest);
         Component existing = componentRepository.findById(uuid)
                 .orElseThrow(() -> new NotFoundException("Component Not Found"));
 
         component.setUuid(existing.getUuid());
+        component.setIcon(file.getOriginalFilename());
 
         if(!component.getIcon().equals(existing.getIcon()) && component.getIcon() != null)
         {
@@ -126,6 +128,8 @@ public class ComponentServiceImpl_V2 implements ComponentService {
             String newFilename = component.getName() + filesStorageService.getFileExtension(originalFilename);
             filesStorageService.saveAs(file, "/component/" + newFilename);
             component.setIcon(newFilename);
+        } else {
+            component.setIcon(existing.getIcon());
         }
         return ComponentMapper.MAPPER.mapToComponentDTO(componentRepository.save(component));
     }
