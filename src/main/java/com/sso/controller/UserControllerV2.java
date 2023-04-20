@@ -110,7 +110,7 @@ public class UserControllerV2 {
         );
     }
     @PutMapping("/update")
-    public ResponseEntity<?> update(@RequestParam("id") String uuid, @RequestBody UserDTO userDTO,
+    public ResponseEntity<?> update(@RequestParam("id") String uuid, @ModelAttribute UserDTO userDTO,
                                     @RequestPart("file") MultipartFile file) {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseDTO(true, HttpStatus.OK,"null",userService.updateUser(uuid,userDTO,file))
